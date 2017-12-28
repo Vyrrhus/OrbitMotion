@@ -39,6 +39,7 @@ function affichage() {
 		canvas3.height = height;
 		canvas4.width = width;
 		canvas4.height = height;
+		center = [Math.floor(width/2), Math.floor(height/2)];
 		running = false;
 		canvas.click();
 	}
