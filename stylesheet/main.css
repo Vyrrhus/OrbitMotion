@@ -1,0 +1,7 @@
+* { margin: 0; padding: 0;}
+
+body, html { height:100%; }
+
+#canvas, #canvas2, #canvas3, #canvas4 {
+    position:absolute;
+}
