@@ -3,6 +3,7 @@ var canvas = document.getElementById('canvas');
 var canvas2 = document.getElementById('canvas2');
 var canvas3 = document.getElementById('canvas3');
 var canvas4 = document.getElementById('canvas4');
+var canvas0 = document.getElementById('canvas0');
 var parent = document.getElementById('body');
 canvas.width = parent.offsetWidth;
 canvas.height = parent.offsetHeight;
@@ -12,6 +13,8 @@ canvas3.width = parent.offsetWidth;
 canvas3.height = parent.offsetHeight;
 canvas4.width = parent.offsetWidth;
 canvas4.height = parent.offsetHeight;
+canvas0.width = parent.offsetWidth;
+canvas0.height = parent.offsetHeight;
 
 var width = canvas.width;
 var height = canvas.height;
@@ -25,6 +28,12 @@ var running = false;
 var angle = 0;
 
 // Adapt the size of the canvas to the window it belongs to
+var ctx0 = canvas0.getContext('2d');
+var BACKGROUND = new Image();
+BACKGROUND.onload = function() {console.log('Image loaded successfully')};
+BACKGROUND.onerror = function() {console.log('Image failed to load')};
+BACKGROUND.src = 'bide.png';
+
 window.onload = affichage;
 function affichage() {
 	window.addEventListener('resize', resizeCanvas, false);
@@ -39,6 +48,8 @@ function affichage() {
 		canvas3.height = height;
 		canvas4.width = width;
 		canvas4.height = height;
+		canvas0.width = width;
+		canvas0.height = height;
 		center = [Math.floor(width/2), Math.floor(height/2)];
 		running = false;
 		canvas.click();
