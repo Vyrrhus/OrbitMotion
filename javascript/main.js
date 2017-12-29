@@ -1,153 +1,131 @@
 // Canvas
-var canvas = document.getElementById('canvas');
-var canvas2 = document.getElementById('canvas2');
-var canvas3 = document.getElementById('canvas3');
-var canvas4 = document.getElementById('canvas4');
-var canvas0 = document.getElementById('canvas0');
-var parent = document.getElementById('body');
-canvas.width = parent.offsetWidth;
-canvas.height = parent.offsetHeight;
-canvas2.width = parent.offsetWidth;
-canvas2.height = parent.offsetHeight;
-canvas3.width = parent.offsetWidth;
-canvas3.height = parent.offsetHeight;
-canvas4.width = parent.offsetWidth;
-canvas4.height = parent.offsetHeight;
-canvas0.width = parent.offsetWidth;
-canvas0.height = parent.offsetHeight;
+var BACKGROUND = document.getElementById('background');
+var DRAWING = document.getElementById('canvas');
 
-var width = canvas.width;
-var height = canvas.height;
-var center = [Math.floor(width/2), Math.floor(height/2)];
-var ctx = canvas.getContext('2d');
-var ctx2 = canvas2.getContext('2d');
-var ctx3 = canvas3.getContext('2d');
-var ctx4 = canvas4.getContext('2d');
-var raf;
-var running = false;
-var angle = 0;
+// Contexts
+var context_BACKGROUND = BACKGROUND.getContext('2d');
+var context_DRAWING = DRAWING.getContext('2d');
 
-// Adapt the size of the canvas to the window it belongs to
-var ctx0 = canvas0.getContext('2d');
-var BACKGROUND = new Image();
-BACKGROUND.onload = function() {console.log('Image loaded successfully')};
-BACKGROUND.onerror = function() {console.log('Image failed to load')};
-BACKGROUND.src = 'bide.png';
+// Settings
+RUNNING = true;
 
-window.onload = affichage;
-function affichage() {
-	window.addEventListener('resize', resizeCanvas, false);
-	function resizeCanvas() {
-		width = parent.offsetWidth;
-		height = parent.offsetHeight;
-		canvas.width = width;
-		canvas.height = height;
-		canvas2.width = width;
-		canvas2.height = height;
-		canvas3.width = width;
-		canvas3.height = height;
-		canvas4.width = width;
-		canvas4.height = height;
-		canvas0.width = width;
-		canvas0.height = height;
-		center = [Math.floor(width/2), Math.floor(height/2)];
-		running = false;
-		canvas.click();
-	}
+// Screen size
+var WIDTH = document.getElementById('body').offsetWidth;
+var HEIGHT = document.getElementById('body').offsetHeight;
+var CENTER = [Math.floor(WIDTH/2), Math.floor(HEIGHT/2)];
+
+/* Adjust the size of canvas to the size of the screen */
+//window.onload = function() {
+//	function resize() {
+//		WIDTH = document.getElementById('body').offsetWidth;
+//		HEIGHT = document.getElementById('body').offsetHeight;
+//		CENTER = [Math.floor(WIDTH/2), Math.floor(HEIGHT/2)];
+//		resizeCanvas(BACKGROUND, DRAWING, INTERFACE);
+//		function resizeCanvas() {
+//			[].forEach.call(arguments, function (element) {
+//				element.width = WIDTH;
+//				element.height = HEIGHT;
+//			});
+//		}
+//	}
+//	resize();
+//	context_DRAWING.fillStyle = "#FF0000"; 
+//	context_DRAWING.fillRect(CENTER[0],CENTER[1],150,75);
+//	window.addEventListener('resize', function() {
+//		console.log('resize');
+//		console.log(CENTER);
+//		resize();
+//		console.log(CENTER);
+//	}, false);
+//}
+//
+//// Settings
+
+// Background
+function background(X,Y,COLOR,CONTEXT) {
+	
 }
 
-var circle = {
-	x: center[0]+200,
-	y: center[1],
-	radius: 30,
-	color: 'blue',
-	draw: function() {
-		ctx.beginPath();
-		ctx.arc(this.x, this.y, this.radius, 0, Math.PI*2, true);
-		ctx.closePath();
-		ctx.fillStyle = this.color;
-		ctx.fill();
-	}
-};
+// Circles defined
+function circle(X,Y,RADIUS,COLOR,CONTEXT) {
+	var object = {
+		x: X,
+		y: Y,
+		radius: RADIUS,
+		color: COLOR,
+		draw: function() {
+			CONTEXT.beginPath();
+			CONTEXT.arc(this.x,this.y,this.radius,0,Math.PI*2);
+			CONTEXT.fillStyle = COLOR;
+			CONTEXT.fill();
+			CONTEXT.closePath();
+		},
+		motion: function(ORIGIN, RADIUS, ANGLE) {
+			this.x = ORIGIN[0] + RADIUS * Math.cos(2 * ANGLE * Math.PI * 2);
+			this.y = ORIGIN[1] + RADIUS * Math.sin(2 * ANGLE * Math.PI * 2);
+		},
+		line: function() {
+			CONTEXT.beginPath();
+			CONTEXT.rect(this.x, this.y-1, WIDTH-this.x,3);
+			CONTEXT.fillStyle = COLOR;
+			CONTEXT.fill();
+			CONTEXT.closePath();
+		}
+	};
+	return object;
+}
 
-var circle2 = {
-	x: circle.x+circle.radius,
-	y: center[1],
-	radius: 20,
-	color: 'red',
-	draw: function() {
-		ctx2.beginPath();
-		ctx2.arc(this.x, this.y, this.radius, 0, Math.PI*2, true);
-		ctx2.closePath();
-		ctx2.fillStyle = this.color;
-		ctx2.fill();
-	}
-};
+var c0 = circle(CENTER[0]+200, CENTER[1], 50, 'green', context_DRAWING);
+var c1 = circle(c0.x + c0.radius, CENTER[1], 30, 'blue', context_DRAWING);
+var c2 = circle(c1.x + c1.radius, CENTER[1], 20, 'red', context_DRAWING);
+var c3 = circle(c2.x + c2.radius, CENTER[1], 10, 'yellow', context_DRAWING);
+var c4 = circle(c3.x + c3.radius, CENTER[1], 5, 'black', context_DRAWING);
 
-var circle3 = {
-	x: circle2.x+circle2.radius,
-	y: center[1],
-	radius: 10,
-	color: 'green',
-	draw: function() {
-		ctx3.beginPath();
-		ctx3.arc(this.x, this.y, this.radius, 0, Math.PI*2, true);
-		ctx3.closePath();
-		ctx3.fillStyle = this.color;
-		ctx3.fill();
-	}
-};
+c0.draw();
+c1.draw();
+c2.draw();
+c3.draw();
+c4.draw();
 
-var circle4 = {
-	x: circle3.x+circle3.radius,
-	y: center[1],
-	radius: 5,
-	color: 'black',
-	draw: function() {
-		ctx4.beginPath();
-		ctx4.arc(this.x, this.y, this.radius, 0, Math.PI*2, true);
-		ctx4.closePath();
-		ctx4.fillStyle = this.color;
-		ctx4.fill();
-	}
-};
-
-
+//Drawing
+angle = 0;
+velocity = 0.38;
 function draw() {
+	context_DRAWING.clearRect(0, 0, WIDTH, HEIGHT);
+	c0.draw();
+	c1.draw();
+	c2.draw();
+	c3.draw();
+	c4.draw();
+	c0.line();
+	c4.line();
+	angle = (angle+Math.PI/720 * velocity)%(4*Math.PI);
 	
-	ctx.fillStyle='rgba(255,255,255,0.3)'; // fillStyle + fillRect au lieu de clearRect pour effet de traînée
-	ctx.fillRect(0,0,width, height);
-	circle.draw();
-	angle += Math.PI/180/1
-	circle.x = center[0] + 200 * Math.cos(4 * angle / Math.PI);
-	circle.y = center[1] + 200 * Math.sin(4 * angle / Math.PI);
-	
-	ctx2.clearRect(0,0,canvas2.width, canvas2.height);
-	circle2.draw();
-	circle2.x = circle.x + circle.radius * Math.cos(4 * angle * 3 / Math.PI);
-	circle2.y = circle.y + circle.radius * Math.sin(4 * angle * 3 / Math.PI);
-	
-	ctx3.clearRect(0,0,canvas3.width, canvas3.height);
-	circle3.draw();
-	circle3.x = circle2.x + circle2.radius * Math.cos(4 * angle * 5 / Math.PI);
-	circle3.y = circle2.y + circle2.radius * Math.sin(4 * angle * 5 / Math.PI);
-	
-	ctx4.clearRect(0,0,canvas4.width, canvas4.height);
-	circle4.draw();
-	circle4.x = circle3.x + circle3.radius * Math.cos(4 * angle * 7 / Math.PI);
-	circle4.y = circle3.y + circle3.radius * Math.sin(4 * angle * 7 / Math.PI);
-	raf = window.requestAnimationFrame(draw);
+	c0.motion(CENTER, 200, angle);
+	c1.motion([c0.x, c0.y], c0.radius, 3*angle);
+	c2.motion([c1.x, c1.y], c1.radius, 5*angle);
+	c3.motion([c2.x, c2.y], c2.radius, 7*angle);
+	c4.motion([c3.x, c3.y], c3.radius, 9*angle);
+	if (RUNNING) {
+		requestAnimationFrame(draw);
+	}
 }
+draw();
 
+// Events
+document.addEventListener('keypress', function(event) {
+	if (event.key === '+') {velocity *= 1.1;}
+	if (event.key === '-') {velocity *= 0.9;}
+	if (event.key === 'q') {
+		RUNNING = !RUNNING;
+		if (RUNNING) {
+			draw();
+		}
+	}
+});
 
-raf = window.requestAnimationFrame(draw);
-//circle.draw()
-//circle2.draw();
-//circle3.draw();
-//circle4.draw();
-
-/*
-1st canvas : background : "nuit étoilée"
-2nd canvas : planets + Sun : Sun, Venus, Earth, Mars for now
-3rd canvas : boutons : vitesse simulation (+/-), start/stop/pause, défilement planète (+/-), moar infos
-*/
+///*
+//1st canvas : background : "nuit étoilée"
+//2nd canvas : planets + Sun : Sun, Venus, Earth, Mars for now
+//3rd canvas : boutons : vitesse simulation (+/-), start/stop/pause, défilement planète (+/-), moar infos
+//*/
