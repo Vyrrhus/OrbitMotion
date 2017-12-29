@@ -2,6 +2,13 @@
 
 body, html { height:100%; }
 
-#canvas, #canvas2, #canvas3, #canvas4, #canvas0 {
+#background, #drawing {
     position:absolute;
+}
+
+#background {
+	z-index: 0;
+}
+#drawing {
+	z-index: 1;
 }
