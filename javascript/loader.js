@@ -12,7 +12,7 @@ var WIDTH  = document.getElementById('body').offsetWidth;
 var HEIGHT = document.getElementById('body').offsetHeight;
 var CENTER = [Math.floor (WIDTH/2),
 			  Math.floor(HEIGHT/2)];
-var PX 	= 2 * UA / Math.min(WIDTH, HEIGHT);		// km
+var PX 	= 12 * UA / Math.min(WIDTH, HEIGHT);		// km
 /* At first, Earth is the outer border of the screen. Thus 2 UA <=> WIDTH or HEIGHT. */
 
 // Canvas
@@ -30,8 +30,25 @@ var context_TEXT 		= TEXT.getContext('2d');
 var context_CONTROL 	= CONTROL.getContext('2d');
 
 // Settings
+var TIME = 0;
+var dT = 3600;
 var RUNNING = true;
-var FOCUS = [0,0];
+var DRAW_ORBIT = false;
+var FOCUS = {
+	position: [0,0],
+	planet: 'initialization',
+	change: function(planet) {
+		context_ORBIT.clearRect(0,0,WIDTH,HEIGHT);
+		this.planet = planet;
+		context_TEXT.clearRect(0,0,WIDTH,HEIGHT);
+		this.draw();
+	},
+	draw: function() {
+		context_TEXT.font = "16px Arial";
+		context_TEXT.fillStyle = "#BBB";
+		context_TEXT.fillText("Focus on : " + this.planet.name, 10, 60);
+	}
+};
 
 // SI Units functions
 function km_to_UA(value) {
