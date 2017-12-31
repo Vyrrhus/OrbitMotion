@@ -1,7 +1,5 @@
 // Planet class
 function _planet(NAME, MASS, RADIUS, COLOR, ORBIT) {
-	console.log('function _planet called');
-	console.log(NAME);
 	// self
 	var self = this;
 	
@@ -31,13 +29,15 @@ function _planet(NAME, MASS, RADIUS, COLOR, ORBIT) {
 	
 	// Drawing
 	this.setFocus = function() {
-		if (this.ORBIT == null) {
-			FOCUS = [0,0];
+//		console.log('enter');
+//		console.log(this.orbit);
+		if (this.orbit == null) {
+			FOCUS.position = [0,0];
 		}
 		else {
 			X = km_to_px(this.orbit.position.x);
 			Y = km_to_px(this.orbit.position.y);
-			FOCUS = [X, Y];
+			FOCUS.position = [X, Y];
 		}
 	}
 	this.draw = function(time) {									
@@ -46,7 +46,6 @@ function _planet(NAME, MASS, RADIUS, COLOR, ORBIT) {
 			px_RADIUS = 5;
 		}
 		if (this.orbit != null) {
-			this.orbit.motion(time);
 			X = km_to_px(this.orbit.position.x)
 			Y = km_to_px(this.orbit.position.y)
 		}
@@ -54,15 +53,17 @@ function _planet(NAME, MASS, RADIUS, COLOR, ORBIT) {
 			X = 0;
 			Y = 0;
 		}
-		X += CENTER[0] - FOCUS[0];
-		Y += CENTER[1] - FOCUS[1];
+		X += CENTER[0] - FOCUS.position[0];
+		Y += CENTER[1] - FOCUS.position[1];
 		Y = - Y + HEIGHT;
-		context_ORBIT.beginPath();
-		context_ORBIT.rect(X, Y, 1, 1);
-		context_ORBIT.fillStyle = COLOR;
-		context_ORBIT.fill();
-		context_ORBIT.closePath();
-		/* That draw only one point ; if we zoom, we'll have to redraw each and every of these points within the boundaries (WIDTH & HEIGHT)*/
+		if (DRAW_ORBIT) {
+			context_ORBIT.beginPath();
+			context_ORBIT.rect(X, Y, 1, 1);
+			context_ORBIT.fillStyle = COLOR;
+			context_ORBIT.fill();
+			context_ORBIT.closePath();
+			/* That draw only one point ; if we zoom, we'll have to redraw each and every of these points within the boundaries (WIDTH & HEIGHT)*/
+		}
 		
 		context_ANIMATION.beginPath();
 		context_ANIMATION.arc(X, Y, px_RADIUS, 0, Math.PI * 2);
@@ -186,18 +187,21 @@ function _orbit(PARENT, INCLINATION, NA_LONGITUDE, SEMI_MAJOR_AXIS, ECCENTRICITY
 		v_perifocal = matrix.transpose(v_perifocal);
 		
 		// Rotation matrix and body-centered state vectors :
+		let NA = deg_to_rad(this.W);
+		let AR = deg_to_rad(this.w);
+		let IN = deg_to_rad(this.i);
 		let DCM = 	[
-						[-Math.sin(this.W) * Math.cos(this.i) * Math.sin(this.w) + Math.cos(this.W) * Math.cos(this.w),
-						Math.cos(this.W) * Math.cos(this.i) * Math.sin(this.w) + Math.sin(this.W) * Math.cos(this.w),
-						Math.sin(this.i) * Math.sin(this.w)
+						[-Math.sin(NA) * Math.cos(IN) * Math.sin(AR) + Math.cos(NA) * Math.cos(AR),
+						Math.cos(NA) * Math.cos(IN) * Math.sin(AR) + Math.sin(NA) * Math.cos(AR),
+						Math.sin(IN) * Math.sin(AR)
 						],
-						[-Math.sin(this.W) * Math.cos(this.i) * Math.cos(this.w) - Math.cos(this.W) * Math.sin(this.w),
-						 Math.cos(this.W) * Math.cos(this.i) * Math.cos(this.w) - Math.sin(this.W) * Math.sin(this.w),
-						 Math.sin(this.i) * Math.cos(this.w)
+						[-Math.sin(NA) * Math.cos(IN) * Math.cos(AR) - Math.cos(NA) * Math.sin(AR),
+						 Math.cos(NA) * Math.cos(IN) * Math.cos(AR) - Math.sin(NA) * Math.sin(AR),
+						 Math.sin(IN) * Math.cos(AR)
 						],
-						[Math.sin(this.W) * Math.sin(this.i),
-						 - Math.cos(this.W) * Math.sin(this.i),
-						 Math.cos(this.i)
+						[Math.sin(NA) * Math.sin(IN),
+						 - Math.cos(NA) * Math.sin(IN),
+						 Math.cos(IN)
 						]
 					];
 		let r_centered = matrix.product(DCM, r_perifocal);
