@@ -1,133 +1,87 @@
-// Canvas
-var DRAWING = document.getElementById('drawing');
-var BACKGROUND = document.getElementById('background');
-
-
-// Contexts
-var context_BACKGROUND = BACKGROUND.getContext('2d');
-var context_DRAWING = DRAWING.getContext('2d');
-
-// Settings
-RUNNING = true;
-
-// Screen size
-var WIDTH = document.getElementById('body').offsetWidth;
-var HEIGHT = document.getElementById('body').offsetHeight;
-var CENTER = [Math.floor(WIDTH/2), Math.floor(HEIGHT/2)];
-
-/* Adjust the size of canvas to the size of the screen */
+// Resize of canvas:
 window.onload = function() {
+	resize();
+	window.addEventListener('resize', resize, false);
 	function resize() {
-		WIDTH = document.getElementById('body').offsetWidth;
+		WIDTH  = document.getElementById('body').offsetWidth;
 		HEIGHT = document.getElementById('body').offsetHeight;
-		CENTER = [Math.floor(WIDTH/2), Math.floor(HEIGHT/2)];
-		resizeCanvas(BACKGROUND, DRAWING);
+		CENTER = [Math.floor (WIDTH/2),
+				  Math.floor(HEIGHT/2)];
+		resizeCanvas(BACKGROUND,ORBIT,ANIMATION,TEXT,CONTROL);
 		function resizeCanvas() {
-			[].forEach.call(arguments, function (element) {
-				element.width = WIDTH;
+			[].forEach.call(arguments, function(element) {
+				element.width  = WIDTH;
 				element.height = HEIGHT;
 			});
 		}
-		background('black', context_BACKGROUND);
+		// Function for backgrounds redraw at each resize
+		set_BACKGROUND();
 	}
-	resize();
-	window.addEventListener('resize', function() {
-		console.log('resize');
-		resize();
-	}, false);
 }
 
-// Background
-function background(COLOR,CONTEXT) {
-	CONTEXT.beginPath();
-	CONTEXT.rect(0,0,WIDTH,HEIGHT);
-	CONTEXT.fillStyle = COLOR;
-	CONTEXT.fill();
-	CONTEXT.closePath();
-}
-
-// Circles defined
-function circle(X,Y,RADIUS,COLOR,CONTEXT) {
-	var object = {
-		x: X,
-		y: Y,
-		radius: RADIUS,
-		color: COLOR,
-		draw: function() {
-			CONTEXT.beginPath();
-			CONTEXT.arc(this.x,this.y,this.radius,0,Math.PI*2);
-			CONTEXT.fillStyle = COLOR;
-			CONTEXT.fill();
-			CONTEXT.closePath();
-		},
-		motion: function(ORIGIN, RADIUS, ANGLE) {
-			this.x = ORIGIN[0] + RADIUS * Math.cos(2 * ANGLE * Math.PI * 2);
-			this.y = ORIGIN[1] + RADIUS * Math.sin(2 * ANGLE * Math.PI * 2);
-		},
-		line: function() {
-			CONTEXT.beginPath();
-			CONTEXT.rect(this.x, this.y-1, WIDTH-this.x,3);
-			CONTEXT.fillStyle = COLOR;
-			CONTEXT.fill();
-			CONTEXT.closePath();
+// Fill canvas with 'background.png'
+function set_BACKGROUND() {
+	var img_BACKGROUND = new Image();
+	img_BACKGROUND.onload = function() {
+		var Y = 0;
+		while (Y < HEIGHT) {
+			fill_width();
+			Y += img_BACKGROUND.height;
+		}
+		function  fill_width() {
+			var X = 0;
+			while (X < WIDTH) {
+				context_BACKGROUND.drawImage(img_BACKGROUND, X, Y);
+				X += img_BACKGROUND.width;
+			}
 		}
 	};
-	return object;
+	img_BACKGROUND.onerror = function() {
+		console.log('failed to load !');
+	}
+	img_BACKGROUND.src = 'img/background.png';
 }
 
-var c0 = circle(CENTER[0]+200, CENTER[1], 50, 'green', context_DRAWING);
-var c1 = circle(c0.x + c0.radius, CENTER[1], 30, 'blue', context_DRAWING);
-var c2 = circle(c1.x + c1.radius, CENTER[1], 20, 'red', context_DRAWING);
-var c3 = circle(c2.x + c2.radius, CENTER[1], 10, 'yellow', context_DRAWING);
-var c4 = circle(c3.x + c3.radius, CENTER[1], 5, 'white', context_DRAWING);
-
-background('black', context_BACKGROUND);
-c0.draw();
-c1.draw();
-c2.draw();
-c3.draw();
-c4.draw();
-
-
-//Drawing
-angle = 0;
-velocity = 0.38;
+var time = 3600;
 function draw() {
-	context_DRAWING.clearRect(0, 0, WIDTH, HEIGHT);
-	c0.draw();
-	c0.line();
-	c1.draw();
-	c2.draw();
-	c3.draw();
-	c4.draw();
-	c4.line();
-	angle = (angle+Math.PI/720 * velocity)%(4*Math.PI);
-	
-	c0.motion(CENTER, 200, angle);
-	c1.motion([c0.x, c0.y], c0.radius, 3*angle);
-	c2.motion([c1.x, c1.y], c1.radius, 5*angle);
-	c3.motion([c2.x, c2.y], c2.radius, 7*angle);
-	c4.motion([c3.x, c3.y], c3.radius, 9*angle);
+	context_ANIMATION.clearRect(0,0,WIDTH,HEIGHT);
+	SUN.draw(time);
+	MERCURY.draw(time);
+	VENUS.draw(time);
+	EARTH.draw(time);
+	MARS.draw(time);
 	if (RUNNING) {
 		requestAnimationFrame(draw);
 	}
 }
 draw();
 
-// Events
 document.addEventListener('keypress', function(event) {
-	if (event.key === '+') {velocity *= 1.1;}
-	if (event.key === '-') {velocity *= 0.9;}
-	if (event.key === 'q') {
+	if (event.key === '+') {time*=1.25;}
+	if (event.key === '-') {time*=0.8;}
+	if (event.keyCode === 32) {
 		RUNNING = !RUNNING;
-		if (RUNNING) {
-			draw();
-		}
+		if (RUNNING) {draw();}
 	}
-});
+	if (event.keyCode === 47) {time *= -1;}
+	console.log(event.key);
+	console.log(event.keyCode);
+})
+/*
+	Functions to add:
+	- orbits
+	- controls :
+	- timeline + start, pause, retour arrière, ++, --, changer de focus
+	- titles
+	- infos
+	
+	Let's focus on the animation itself :
+		> object planet with all informations
+		> object orbit with all parameters
+		> method for planets : draw planet() (fonction du zoom)
+		> method for orbits : draw orbit()
+		
+		
+	ATTENTION : pour l'orbite, il faut la redraw à chaque frame car elle est sensible au zoom (fuck)
+*/
 
-///*
-//1st canvas : background : "nuit étoilée"
-//2nd canvas : planets + Sun : Sun, Venus, Earth, Mars for now
-//3rd canvas : boutons : vitesse simulation (+/-), start/stop/pause, défilement planète (+/-), moar infos
-//*/
