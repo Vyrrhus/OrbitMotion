@@ -41,15 +41,38 @@ function set_BACKGROUND() {
 	}
 	img_BACKGROUND.src = 'img/background.png';
 }
+function text_time() {
+	context_ANIMATION.font = "16px Arial";
+	context_ANIMATION.fillStyle = "#BBB";
+	context_ANIMATION.fillText("Time " + Math.floor(TIME) + " s", 10, 30);
+}
 
-var time = 3600;
+var clog = true;
+FOCUS.change(SUN);
 function draw() {
 	context_ANIMATION.clearRect(0,0,WIDTH,HEIGHT);
-	SUN.draw(time);
-	MERCURY.draw(time);
-	VENUS.draw(time);
-	EARTH.draw(time);
-	MARS.draw(time);
+	MERCURY.orbit.motion(dT);
+	VENUS.orbit.motion(dT);
+	EARTH.orbit.motion(dT);
+	MARS.orbit.motion(dT);
+	JUPITER.orbit.motion(dT);
+	SATURNE.orbit.motion(dT);
+	URANUS.orbit.motion(dT);
+	NEPTUNE.orbit.motion(dT);
+	TIME += dT;
+	text_time();
+	
+	FOCUS.planet.setFocus();
+	
+	SUN.draw();
+	MERCURY.draw();
+	VENUS.draw();
+	EARTH.draw();
+	MARS.draw();
+	JUPITER.draw();
+	URANUS.draw();
+	SATURNE.draw();
+	NEPTUNE.draw();
 	if (RUNNING) {
 		requestAnimationFrame(draw);
 	}
@@ -57,15 +80,30 @@ function draw() {
 draw();
 
 document.addEventListener('keypress', function(event) {
-	if (event.key === '+') {time*=1.25;}
-	if (event.key === '-') {time*=0.8;}
-	if (event.keyCode === 32) {
+	if (event.key === '+') {dT*=1.25;}
+	if (event.key === '-') {dT*=0.8;}
+	if (event.key === '1') {FOCUS.change(SUN);}
+	if (event.key === '2') {FOCUS.change(MERCURY);}
+	if (event.key === '3') {FOCUS.change(VENUS);}
+	if (event.key === '4') {FOCUS.change(EARTH);}
+	if (event.key === '5') {FOCUS.change(MARS);}
+	if (event.key === '6') {FOCUS.change(JUPITER);}
+	if (event.key === '7') {FOCUS.change(SATURNE);}
+	if (event.key === '8') {FOCUS.change(URANUS);}
+	if (event.key === '9') {FOCUS.change(NEPTUNE);}
+	if (event.key === 'a') {DRAW_ORBIT = !DRAW_ORBIT;}
+	if (event.keyCode === 32 || event.key === 'q') {
 		RUNNING = !RUNNING;
 		if (RUNNING) {draw();}
 	}
-	if (event.keyCode === 47) {time *= -1;}
-	console.log(event.key);
-	console.log(event.keyCode);
+	if (event.keyCode === 47) {dT *= -1;}
+	if (event.key === '0') {
+		RUNNING = false;
+		dT = - TIME;
+		context_ORBIT.clearRect(0,0,WIDTH,HEIGHT);
+		draw();
+		dT = 3600;
+	}
 })
 /*
 	Functions to add:
