@@ -1,87 +1,62 @@
-// Resize of canvas:
-window.onload = function() {
-	resize();
-	window.addEventListener('resize', resize, false);
-	function resize() {
-		WIDTH  = document.getElementById('body').offsetWidth;
-		HEIGHT = document.getElementById('body').offsetHeight;
-		CENTER = [Math.floor (WIDTH/2),
-				  Math.floor(HEIGHT/2)];
-		resizeCanvas(BACKGROUND,ORBIT,ANIMATION,TEXT,CONTROL);
-		function resizeCanvas() {
-			[].forEach.call(arguments, function(element) {
-				element.width  = WIDTH;
-				element.height = HEIGHT;
-			});
+document.addEventListener('keypress', function(event) {
+	if (event.key === '+' || event.key === '-') {
+		if (event.key === '+') {
+			TIME.dT*=1.25;
 		}
-		// Function for backgrounds redraw at each resize
-		set_BACKGROUND();
-		FOCUS.draw();
-		PX.scale(20,30);
-		CONTROL.draw_ORBIT.draw();
+		else {
+			TIME.dT*=0.8;
+		}
+		if (Math.abs(TIME.dT) < 1) {TIME.dT = 1 * Math.sign(TIME.dT);}
+		if (TIME.dT > 365.25*86400) {TIME.dT = 365.25*86400;}
 	}
-}
-
-
-		context_TEXT.font = "16px Arial";
-		context_TEXT.fillStyle = "#BBB";
-		context_TEXT.fillText("Time: " + this.date, 10, 30);
-
-// Fill canvas with 'background.png'
-function set_BACKGROUND() {
-	var img_BACKGROUND = new Image();
-	img_BACKGROUND.onload = function() {
-		var Y = 0;
-		while (Y < HEIGHT) {
-			fill_width();
-			Y += img_BACKGROUND.height;
-		}
-		function  fill_width() {
-			var X = 0;
-			while (X < WIDTH) {
-				context_BACKGROUND.drawImage(img_BACKGROUND, X, Y);
-				X += img_BACKGROUND.width;
-			}
-		}
-	};
-	img_BACKGROUND.onerror = function() {
-		console.log('failed to load !');
-	};
-	img_BACKGROUND.src = 'img/background.png';
-}
-
-var clog = true;
-FOCUS.change(SUN);
-
-function draw() {
-	context_ANIMATION.clearRect(0,0,WIDTH,HEIGHT);
-	MERCURY.orbit.motion(TIME.dT);
-	VENUS.orbit.motion(TIME.dT);
-	EARTH.orbit.motion(TIME.dT);
-	MARS.orbit.motion(TIME.dT);
-	JUPITER.orbit.motion(TIME.dT);
-	SATURNE.orbit.motion(TIME.dT);
-	URANUS.orbit.motion(TIME.dT);
-	NEPTUNE.orbit.motion(TIME.dT);
-	MOON.orbit.motion(TIME.dT);
-	TIME.value += TIME.dT;
-	TIME.draw();
-	
-	FOCUS.planet.setFocus();
-	
-	SUN.draw();
-	MERCURY.draw();
-	VENUS.draw();
-	EARTH.draw();
-	MARS.draw();
-	JUPITER.draw();
-	URANUS.draw();
-	SATURNE.draw();
-	NEPTUNE.draw();
-	MOON.draw();
-	if (RUNNING) {
-		requestAnimationFrame(draw);
+	if (event.key === '1') {FOCUS.change(SUN);}
+	if (event.key === '2') {FOCUS.change(MERCURY);}
+	if (event.key === '3') {FOCUS.change(VENUS);}
+	if (event.key === '4') {FOCUS.change(EARTH);}
+	if (event.key === '5') {FOCUS.change(MARS);}
+	if (event.key === '6') {FOCUS.change(JUPITER);}
+	if (event.key === '7') {FOCUS.change(SATURNE);}
+	if (event.key === '8') {FOCUS.change(URANUS);}
+	if (event.key === '9') {FOCUS.change(NEPTUNE);}
+	if (event.key === 'a') {
+		CONTROL.draw_ORBIT.switch();
 	}
-}
-draw();
+	if (event.keyCode === 32 || event.key === 'q') {
+		PAUSE = !PAUSE;
+		if (PAUSE) {
+			TIME.dT_memory = TIME.dT;
+			TIME.dT = 0;
+		}
+		else {
+			TIME.dT = TIME.dT_memory;
+		}
+	}
+	if (event.keyCode === 47) {TIME.dT *= -1;}
+	if (event.key === '0') {
+		RUNNING = false;
+		TIME.dT = - TIME.value;
+		context_ORBIT.clearRect(0,0,WIDTH,HEIGHT);
+		draw();
+		TIME.dT = 3600;
+	}
+});
 
+document.addEventListener('wheel', function(event) {
+	ZOOM.num += event.deltaY/100;
+	if (ZOOM.num < 0 || ZOOM.num > 82) {
+		ZOOM.num -= event.deltaY/100;
+	}
+	if (ZOOM.num < 55) {ZOOM.unit = 1;ZOOM.unit_name = ' km';}
+	else {ZOOM.unit = UA;ZOOM.unit_name = ' UA';}
+	
+	ZOOM.value = ZOOM.b(ZOOM.num) * Math.pow(10,ZOOM.a(ZOOM.num)) * ZOOM.unit;
+	PX.set();
+	PX.scale(20,30);
+	context_ORBIT.clearRect(0,0,WIDTH,HEIGHT);
+});
+
+document.addEventListener('click', function(event) {
+	if (event.clientX >= 15 && event.clientX <= 30 && event.clientY >= 70 && event.clientY <= 90) {
+		CONTROL.draw_ORBIT.switch();
+	}
+});
