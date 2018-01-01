@@ -28,6 +28,9 @@ function _planet(NAME, MASS, RADIUS, COLOR, ORBIT) {
 	}
 	
 	// Drawing
+	this.x = 0;
+	this.y = 0;
+	this.visible = true;
 	this.setFocus = function() {
 //		console.log('enter');
 //		console.log(this.orbit);
@@ -56,7 +59,17 @@ function _planet(NAME, MASS, RADIUS, COLOR, ORBIT) {
 		X += CENTER[0] - FOCUS.position[0];
 		Y += CENTER[1] - FOCUS.position[1];
 		Y = - Y + HEIGHT;
-		if (DRAW_ORBIT) {
+		this.x = X;
+		this.y = Y;
+		if (this.rank > 0) {
+			if (Math.abs(this.x - this.orbit.parent.x) < 5 && Math.abs(this.y - this.orbit.parent.y) < 5) {
+				this.visible = false;
+			}
+			else {
+				this.visible = true;
+			}
+		}
+		if (CONTROL.draw_ORBIT.state && this.visible) {
 			context_ORBIT.beginPath();
 			context_ORBIT.rect(X, Y, 1, 1);
 			context_ORBIT.fillStyle = COLOR;
@@ -64,12 +77,13 @@ function _planet(NAME, MASS, RADIUS, COLOR, ORBIT) {
 			context_ORBIT.closePath();
 			/* That draw only one point ; if we zoom, we'll have to redraw each and every of these points within the boundaries (WIDTH & HEIGHT)*/
 		}
-		
-		context_ANIMATION.beginPath();
-		context_ANIMATION.arc(X, Y, px_RADIUS, 0, Math.PI * 2);
-		context_ANIMATION.fillStyle = COLOR;
-		context_ANIMATION.fill();
-		context_ANIMATION.closePath();
+		if (this.visible) {
+			context_ANIMATION.beginPath();
+			context_ANIMATION.arc(X, Y, px_RADIUS, 0, Math.PI * 2);
+			context_ANIMATION.fillStyle = COLOR;
+			context_ANIMATION.fill();
+			context_ANIMATION.closePath();
+		}
 	}
 }
 
@@ -118,6 +132,12 @@ function _orbit(PARENT, INCLINATION, NA_LONGITUDE, SEMI_MAJOR_AXIS, ECCENTRICITY
 			this.x = vect[0];
 			this.y = vect[1];
 			this.z = vect[2];
+			if (self.parent.orbit != null) {
+				this.x += self.parent.orbit.position.x;
+				this.y += self.parent.orbit.position.y;
+				this.z += self.parent.orbit.position.z;
+				
+			}
 		}
 	};
 	this.velocity 	= {
