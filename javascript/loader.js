@@ -7,13 +7,106 @@ var I = [1,0,0];
 var J = [0,1,0];
 var K = [0,0,1];
 
+// Settings
+var PAUSE = false;
+var RUNNING = true;
+var TIME = {
+	value: 0,
+	date: '0',
+	dT: 3600,
+	dT_memory: 3600,
+	num: '0',
+	s_to_date: function() {
+		let time = Math.floor(TIME.value);
+		let y = Math.floor(time / (365.25*24*3600));
+		let d = Math.floor((time - y * (365.25*24*3600)) / (24*3600));
+		let h = Math.floor((time - (365.25*y + d) * 24 * 3600) / (3600));
+		let m = Math.floor((time - ((365.25*y+d)*24 + h) * 3600) / 60);
+		let s = time - (((365.25*y + d)* 24 + h)*60+m)*60;
+		this.date = str_date(y) + 'y ' + str_date(d) + 'd - ' + str_date(h) + ':' + str_date(m) + ':' + str_date(s);
+		
+		function str_date(x) {
+			let date = x.toString();
+			let len = date.length;
+			if (len == 1) {date = '0'+date;}
+			return date;
+		}
+	},
+	draw: function() {
+		this.s_to_date();
+		context_TEXT.clearRect(10,10,WIDTH,25)
+		context_TEXT.font = "16px Arial";
+		context_TEXT.fillStyle = "#BBB";
+		context_TEXT.fillText("Time: " + this.date, 10, 30);
+	}
+};
+var FOCUS = {
+	position: [0,0],
+	planet: 'initialization',
+	change: function(planet) {
+		context_ORBIT.clearRect(0,0,WIDTH,HEIGHT);
+		this.planet = planet;
+		context_TEXT.clearRect(10,45,160,20);
+		this.draw();
+	},
+	draw: function() {
+		context_TEXT.font = "16px Arial";
+		context_TEXT.fillStyle = "#BBB";
+		context_TEXT.fillText("Focus on : " + this.planet.name, 10, 60);
+	}
+};
+var ZOOM = {
+	value: 1 * UA,
+	unit: UA,
+	unit_name: 'UA',
+	num: 64,
+	a: function(x) {
+		if (this.unit == 1) {
+			return Math.floor(x/9);
+		}
+		else {
+			return Math.floor((x-1)/9) - 7;
+		}
+	},
+	b: function(x) {
+		if (this.unit == 1) {
+			return x % 9 + 1;
+		}
+		else {
+			return (x-1) % 9 + 1;
+		}
+	}
+};
+
 // Screen size
 var WIDTH  = document.getElementById('body').offsetWidth;
 var HEIGHT = document.getElementById('body').offsetHeight;
 var CENTER = [Math.floor (WIDTH/2),
 			  Math.floor(HEIGHT/2)];
-var PX 	= 12 * UA / Math.min(WIDTH, HEIGHT);		// km
-/* At first, Earth is the outer border of the screen. Thus 2 UA <=> WIDTH or HEIGHT. */
+var PX 	= {
+	value: ZOOM.value / Math.min(WIDTH, HEIGHT),		// km
+	set: function() {
+		PX.value = ZOOM.value / Math.min(WIDTH, HEIGHT);
+	},
+	scale: function(x,y) {
+		let length = Math.min(WIDTH, HEIGHT)/10;
+		let value = Math.round(PX.value/ZOOM.unit*length*100)/100;
+		value = value.toString() + ZOOM.unit_name;
+		let size = 7* value.length;
+		context_TEXT.clearRect(WIDTH-x-length-5,HEIGHT-y-10,x+length+5,y+10);
+		context_TEXT.beginPath();
+		context_TEXT.rect(WIDTH-length-x, HEIGHT-y-5, 1, 10);
+		context_TEXT.rect(WIDTH-x, HEIGHT-y-5, 1, 10);
+		context_TEXT.rect(WIDTH-length-x, HEIGHT-y,length,1);
+		context_TEXT.fillStyle = "#BBB";
+		context_TEXT.fill();
+		context_TEXT.closePath();
+		context_TEXT.font = "13px Arial";
+		context_TEXT.fillStyle = "#BBB";
+		context_TEXT.fillText(value, WIDTH-length/2-x-size/2, HEIGHT-y+15);
+	}
+}
+	
 
 // Canvas
 var BACKGROUND 	= document.getElementById('background');
@@ -29,27 +122,6 @@ var context_ANIMATION 	= ANIMATION.getContext('2d');
 var context_TEXT 		= TEXT.getContext('2d');
 var context_CONTROL 	= CONTROL.getContext('2d');
 
-// Settings
-var TIME = 0;
-var dT = 3600;
-var RUNNING = true;
-var DRAW_ORBIT = false;
-var FOCUS = {
-	position: [0,0],
-	planet: 'initialization',
-	change: function(planet) {
-		context_ORBIT.clearRect(0,0,WIDTH,HEIGHT);
-		this.planet = planet;
-		context_TEXT.clearRect(0,0,WIDTH,HEIGHT);
-		this.draw();
-	},
-	draw: function() {
-		context_TEXT.font = "16px Arial";
-		context_TEXT.fillStyle = "#BBB";
-		context_TEXT.fillText("Focus on : " + this.planet.name, 10, 60);
-	}
-};
-
 // SI Units functions
 function km_to_UA(value) {
 	return value / UA;
@@ -64,7 +136,7 @@ function deg_to_rad(value) {
 	return value * Math.PI / 180;
 }
 function km_to_px(value) {
-	return value / PX;
+	return value / PX.value;
 }
 
 // Math functions
@@ -200,22 +272,32 @@ var vector = {
 	}
 };
 
-// Printer
-function draw_circle(X,Y,RADIUS,COLOR,CONTEXT) {
-	CONTEXT.beginPath();
-	CONTEXT.arc(X,Y,RADIUS,0,Math.PI*2);
-	CONTEXT.fillStyle = COLOR;
-	CONTEXT.fill();
-	CONTEXT.closePath();
-}
-function draw_point(X,Y,COLOR,CONTEXT) {
-	CONTEXT.beginPath();
-	CONTEXT.rect(X,Y,1,1);
-	CONTEXT.fillStyle = COLOR;
-	CONTEXT.fill();
-	CONTEXT.closePath();
-}
-
+// Controls
+var CONTROL = {
+	draw_ORBIT: {
+		state: false,
+		draw: function() {
+			context_CONTROL.clearRect(10, 70, 200, 30);
+			let x = 0;
+			if (this.state) {x = 15;}
+			var img_BUTTON = new Image();
+			img_BUTTON.onload = function() {
+				context_CONTROL.drawImage(img_BUTTON,x,0,15,15,15,75,15,15);
+				context_CONTROL.font = '13px Arial';
+				context_CONTROL.fillStyle = "#BBB";
+				context_CONTROL.fillText('Show orbits', 33, 88);
+			};
+			img_BUTTON.onerror = function() {
+			console.log('failed to load !');
+			};
+			img_BUTTON.src = 'img/orbit.png';
+		},
+		switch: function() {
+			this.state = !this.state;
+			this.draw();
+		}
+	}
+};
 
 /*
 	Use canonical units 1 ER = R+, TU = 806.8s, mu+ = 1 :
