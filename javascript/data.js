@@ -1,6 +1,6 @@
-/*========================================% 
-%					RANK 0				  %
-%========================================*/
+/*
+RANK 0
+*/
 {
 var SUN = new _planet('SUN', 
 				  1.9891e30,
@@ -10,9 +10,9 @@ var SUN = new _planet('SUN',
 }
 
 
-/*========================================% 
-%					RANK 1				  %
-%========================================*/
+/*
+RANK 1
+*/
 // Orbits
 {
 var ORBIT_MERCURY 	= new _orbit(SUN, 
@@ -52,7 +52,7 @@ var ORBIT_JUPITER	= new _orbit(SUN,
 							2.736042883561856E+02, 
 							2.041846436041122E+02);
 
-var ORBIT_SATURNE	= new _orbit(SUN,
+var ORBIT_SATURN	= new _orbit(SUN,
 							2.487689401889006E+00, 
 							1.136052151676273E+02, 
 							9.572140096816266E+00, 
@@ -113,11 +113,11 @@ var JUPITER = new _planet(	'JUPITER',
 				   			69911,
 				   			'#a98723',
 				   			ORBIT_JUPITER);
-var SATURNE = new _planet(	'SATURNE',
+var SATURN = new _planet(	'SATURNE',
 				   			568.319e24,
 				  		 	58232,
 				   			'#f7e4c8',
-				   			ORBIT_SATURNE);
+				   			ORBIT_SATURN);
 var URANUS 	= new _planet(	'URANUS',
 				   			86.8103e24,
 				   			25362,
@@ -136,14 +136,52 @@ var PLUTO = new _planet(	'PLUTO',
 					   		ORBIT_PLUTO);
 }
 
-/*========================================% 
-%					RANK 2				  %
-%========================================*/
+/* 
+RANK 2
+*/
 // Orbits
 {
 var ORBIT_MOON 	= new _orbit(EARTH, 
-						   	5.196960685321760E+00, 1.351208912106474E+02, 2.579309287237687E-03, 7.618173744911751E-02, 3.249459462415981E+02, 3.443568163820373E+02);
+						5.196960685321760E+00, 
+						1.351208912106474E+02, 
+						2.579309287237687E-03, 
+						7.618173744911751E-02, 
+						3.249459462415981E+02, 
+						3.443568163820373E+02);
+
+var ORBIT_IO 	= new _orbit(JUPITER,
+						2.202703864911423E+00, 
+						3.385425331807581E+02, 
+						2.821039215496194E-03, 
+						3.768236108797693E-03, 
+						2.402957809630536E+02, 
+						2.371258545024796E+02);
+	
+var ORBIT_EUROPA = new _orbit(JUPITER,
+						2.683895950717743E+00, 
+						3.364082945913950E+02, 
+						4.486843999106538E-03, 
+						9.700145315441250E-03, 
+						6.569752966635679E+01, 
+						2.978505344627345E+02);
+	
+var ORBIT_GANYMEDE = new _orbit(JUPITER,
+						2.295592704652490E+00, 
+						3.406626851721088E+02, 
+						7.155930235487599E-03, 
+						2.016085670322323E-03, 
+						3.177399158899967E+02, 
+						2.544874399432277E+02);
+	
+var ORBIT_ENCELADUS = new _orbit(SATURN,
+						2.805649671811507E+01,
+						1.695411966560971E+02, 
+						1.593711800889939E-03, 
+						6.417148409504786E-03, 
+						1.926819986280434E+02, 
+						2.280121924070831E-01);
 }
+
 // Planets
 {
 var MOON 	 = new _planet(	'MOON',
@@ -151,4 +189,33 @@ var MOON 	 = new _planet(	'MOON',
 					  		1737.5,
 					  		'#D8D8D8',
 					  		ORBIT_MOON);
+	
+var IO 		= new _planet( 	'IO',
+						 	8.9319e22,
+						 	1821.6,
+						 	'#E8D76F',
+						 	ORBIT_IO);
+	
+var EUROPA 	= new _planet( 	'EUROPA',
+						 	4.7998e22,
+						 	1560.8,
+						 	'#6D8792',
+						 	ORBIT_EUROPA);
+	
+var GANYMEDE = new _planet( 'GANYMEDE',
+						 	1.4819e23,
+						 	2631.2,
+						 	'#372E27',
+						 	ORBIT_GANYMEDE);
+	
+var ENCELADUS = new _planet('ENCELADUS',
+						   1.0794e20,
+						   252.1,
+						   '#EDEDED',
+						   ORBIT_ENCELADUS);
 }
+
+/*
+ALL
+*/
+var DATA = [SUN, MERCURY, VENUS, EARTH, MOON, MARS, JUPITER, IO, EUROPA, GANYMEDE, SATURN, ENCELADUS, URANUS, NEPTUNE, PLUTO];
