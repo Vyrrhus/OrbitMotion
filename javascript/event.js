@@ -63,7 +63,7 @@ document.addEventListener('click', function(event) {
 
 document.addEventListener('click', function(event) {
 	
-	check_coordinates(SUN, MERCURY, VENUS, EARTH, MOON, MARS, JUPITER, SATURNE, URANUS, NEPTUNE);
+	check_coordinates(SUN, MERCURY, VENUS, EARTH, MOON, MARS, JUPITER, SATURNE, URANUS, NEPTUNE, PLUTO);
 	
 	function check_coordinates() {
 		[].forEach.call(arguments, function(element) {
