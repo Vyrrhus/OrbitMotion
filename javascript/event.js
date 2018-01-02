@@ -19,17 +19,10 @@ document.addEventListener('keypress', function(event) {
 	if (event.key === '8') {FOCUS.change(URANUS);}
 	if (event.key === '9') {FOCUS.change(NEPTUNE);}
 	if (event.key === 'a') {
-		CONTROL.draw_ORBIT.switch();
+		BUTTON.draw_ORBIT.switch();
 	}
 	if (event.keyCode === 32 || event.key === 'q') {
-		PAUSE = !PAUSE;
-		if (PAUSE) {
-			TIME.dT_memory = TIME.dT;
-			TIME.dT = 0;
-		}
-		else {
-			TIME.dT = TIME.dT_memory;
-		}
+		BUTTON.draw_TIMELINE.switch();
 	}
 	if (event.keyCode === 47) {TIME.dT *= -1;}
 	if (event.key === '0') {
@@ -38,12 +31,14 @@ document.addEventListener('keypress', function(event) {
 		context_ORBIT.clearRect(0,0,WIDTH,HEIGHT);
 		draw();
 		TIME.dT = 3600;
+		RUNNING = true;
+		draw();
 	}
 });
 
 document.addEventListener('wheel', function(event) {
 	ZOOM.num += event.deltaY/100;
-	if (ZOOM.num < 0 || ZOOM.num > 82) {
+	if (ZOOM.num < 0 || ZOOM.num > 85) {
 		ZOOM.num -= event.deltaY/100;
 	}
 	if (ZOOM.num < 55) {ZOOM.unit = 1;ZOOM.unit_name = ' km';}
@@ -56,20 +51,48 @@ document.addEventListener('wheel', function(event) {
 });
 
 document.addEventListener('click', function(event) {
-	if (event.clientX >= 15 && event.clientX <= 30 && event.clientY >= 70 && event.clientY <= 90) {
-		CONTROL.draw_ORBIT.switch();
+	let mouseX = event.clientX;
+	let mouseY = event.clientY;
+	function button_frame(x0,y0,dx,dy) {
+		if (mouseX >= x0 && mouseX <= (x0+dx) && mouseY >= y0 && mouseY <= (y0+dy)) {return true;}
+		else {return false;}
 	}
-});
-
-document.addEventListener('click', function(event) {
 	
-	check_coordinates(SUN, MERCURY, VENUS, EARTH, MOON, MARS, JUPITER, SATURNE, URANUS, NEPTUNE, PLUTO);
+	// Button draw orbit
+	if (button_frame(15,70,15,20)) {BUTTON.draw_ORBIT.switch();}
 	
+	// Legend for each planet
+	check_coordinates(DATA);
 	function check_coordinates() {
-		[].forEach.call(arguments, function(element) {
-			if (Math.abs(event.clientX - element.x) < element.px_radius && Math.abs(event.clientY - element.y) < element.px_radius) {
+		DATA.forEach(function(element) {
+			if (Math.abs(mouseX - element.x) < element.px_radius && Math.abs(mouseY - element.y) < element.px_radius) {
 				element.legend = !element.legend;
 			}
 		});
+	}
+	
+	// Timeline buttons
+	if (button_frame(WIDTH/2-160,HEIGHT-100,80,80)) {TIME.dT*=0.8;}
+	if (button_frame(WIDTH/2-80,HEIGHT-100,80,80)) {BUTTON.draw_TIMELINE.switch();}
+	if (button_frame(WIDTH/2,HEIGHT-100,80,80)) {
+		RUNNING = false;
+		TIME.dT = - TIME.value;
+		context_ORBIT.clearRect(0,0,WIDTH,HEIGHT);
+		draw();
+		TIME.dT = 3600;
+		RUNNING = true;
+		draw();
+		BUTTON.draw_TIMELINE.switch();
+	}
+	if (button_frame(WIDTH/2+80,HEIGHT-100,80,80)) {TIME.dT*=1.25;}
+	if (button_frame(WIDTH/2-120,HEIGHT-140,40,40)) {
+		FOCUS.num -=1;
+		if (FOCUS.num < 0) { FOCUS.num = DATA.length - 1;}
+		FOCUS.change(DATA[FOCUS.num]);
+	}
+	if (button_frame(WIDTH/2+80,HEIGHT-140,40,40)) {
+		FOCUS.num +=1;
+		if (FOCUS.num == DATA.length) { FOCUS.num = 0;}
+		FOCUS.change(DATA[FOCUS.num]);
 	}
 });
