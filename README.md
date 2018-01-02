@@ -1,9 +1,7 @@
 # OrbitMotion
 
 Soon :
-- date
-- indication on the planet focus
-- plenty of buttons
+- a real time system
 - interface to add satellites & moons
 - perform delta-V manoeuver for those
 - rotations (because only one frame is boring)
