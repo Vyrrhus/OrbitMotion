@@ -30,7 +30,9 @@ function _planet(NAME, MASS, RADIUS, COLOR, ORBIT) {
 	// Drawing
 	this.x = 0;
 	this.y = 0;
+	this.px_radius = 0;
 	this.visible = true;
+	this.legend = true;
 	this.setFocus = function() {
 //		console.log('enter');
 //		console.log(this.orbit);
@@ -48,6 +50,7 @@ function _planet(NAME, MASS, RADIUS, COLOR, ORBIT) {
 		if (px_RADIUS < 5) {
 			px_RADIUS = 5;
 		}
+		this.px_radius = px_RADIUS;
 		if (this.orbit != null) {
 			X = km_to_px(this.orbit.position.x)
 			Y = km_to_px(this.orbit.position.y)
@@ -68,14 +71,9 @@ function _planet(NAME, MASS, RADIUS, COLOR, ORBIT) {
 			else {
 				this.visible = true;
 			}
-		}
-		if (CONTROL.draw_ORBIT.state && this.visible) {
-			context_ORBIT.beginPath();
-			context_ORBIT.rect(X, Y, 1, 1);
-			context_ORBIT.fillStyle = COLOR;
-			context_ORBIT.fill();
-			context_ORBIT.closePath();
-			/* That draw only one point ; if we zoom, we'll have to redraw each and every of these points within the boundaries (WIDTH & HEIGHT)*/
+			if (Math.abs(this.x - this.orbit.parent.x) < 30 && Math.abs(this.y - this.orbit.parent.y) < 30) {
+				this.legend = false;
+			}
 		}
 		if (this.visible) {
 			context_ANIMATION.beginPath();
@@ -83,6 +81,20 @@ function _planet(NAME, MASS, RADIUS, COLOR, ORBIT) {
 			context_ANIMATION.fillStyle = COLOR;
 			context_ANIMATION.fill();
 			context_ANIMATION.closePath();
+			
+			if (CONTROL.draw_ORBIT.state) {
+				context_ORBIT.beginPath();
+				context_ORBIT.rect(X, Y, 1, 1);
+				context_ORBIT.fillStyle = COLOR;
+				context_ORBIT.fill();
+				context_ORBIT.closePath();
+				/* That draw only one point ; if we zoom, we'll have to redraw each and every of these points within the boundaries (WIDTH & HEIGHT)*/
+			}
+			if (this.legend) {
+				context_ANIMATION.font = '10px Arial';
+				context_ANIMATION.fillStyle = "#BBB";
+				context_ANIMATION.fillText(this.name, X - 3*this.name.length, Y-px_RADIUS - 5);
+			}
 		}
 	}
 }
