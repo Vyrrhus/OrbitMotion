@@ -18,7 +18,8 @@ window.onload = function() {
 		set_BACKGROUND();
 		FOCUS.draw();
 		PX.scale(20,30);
-		CONTROL.draw_ORBIT.draw();
+		BUTTON.draw_ORBIT.draw();
+		BUTTON.draw_TIMELINE.draw();
 	}
 }
 
@@ -46,13 +47,15 @@ function set_BACKGROUND() {
 }
 
 function planet_animation() {
-	[].forEach.call(arguments, function(element) {
+	DATA.forEach(function(element) {
+		if (element.orbit != null) {
 			element.orbit.motion(TIME.dT);
+		}
 	});
 }
 function planet_draw() {
-	[].forEach.call(arguments, function(element) {
-			element.draw();
+	DATA.forEach(function(element) {
+		element.draw();
 	});
 }
 
@@ -60,11 +63,11 @@ FOCUS.change(SUN);
 
 function draw() {
 	context_ANIMATION.clearRect(0,0,WIDTH,HEIGHT);
-	planet_animation(MERCURY, VENUS, EARTH, MARS, JUPITER, SATURNE, URANUS, NEPTUNE, PLUTO, MOON);
+	planet_animation(DATA);
 	TIME.value += TIME.dT;
 	TIME.draw();
 	FOCUS.planet.setFocus();
-	planet_draw(SUN, MERCURY, VENUS, EARTH, MARS, JUPITER, SATURNE, URANUS, NEPTUNE, PLUTO, MOON);
+	planet_draw(DATA);
 	
 	if (RUNNING) {
 		requestAnimationFrame(draw);
@@ -72,4 +75,3 @@ function draw() {
 }
 
 draw();
-
