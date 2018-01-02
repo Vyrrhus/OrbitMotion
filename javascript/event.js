@@ -60,3 +60,16 @@ document.addEventListener('click', function(event) {
 		CONTROL.draw_ORBIT.switch();
 	}
 });
+
+document.addEventListener('click', function(event) {
+	
+	check_coordinates(SUN, MERCURY, VENUS, EARTH, MOON, MARS, JUPITER, SATURNE, URANUS, NEPTUNE);
+	
+	function check_coordinates() {
+		[].forEach.call(arguments, function(element) {
+			if (Math.abs(event.clientX - element.x) < element.px_radius && Math.abs(event.clientY - element.y) < element.px_radius) {
+				element.legend = !element.legend;
+			}
+		});
+	}
+});
