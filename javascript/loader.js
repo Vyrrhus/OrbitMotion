@@ -53,6 +53,10 @@ var FOCUS = {
 		context_TEXT.font = "16px Arial";
 		context_TEXT.fillStyle = "#BBB";
 		context_TEXT.fillText("Focus on : " + this.planet.name, 10, 60);
+		context_TEXT.clearRect(WIDTH/2-200,HEIGHT-150,400,150);
+		context_TEXT.font = "24px Arial";
+		context_TEXT.fillStyle = "#000";
+		context_TEXT.fillText(FOCUS.planet.name,WIDTH/2-FOCUS.planet.name.length*8, HEIGHT-110);
 	}
 };
 var ZOOM = {
