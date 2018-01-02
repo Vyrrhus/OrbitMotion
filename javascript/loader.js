@@ -8,12 +8,11 @@ var J = [0,1,0];
 var K = [0,0,1];
 
 // Settings
-var PAUSE = false;
 var RUNNING = true;
 var TIME = {
 	value: 0,
 	date: '0',
-	dT: 3600,
+	dT: 0,
 	dT_memory: 3600,
 	num: '0',
 	s_to_date: function() {
@@ -42,11 +41,12 @@ var TIME = {
 };
 var FOCUS = {
 	position: [0,0],
+	num: 0,
 	planet: 'initialization',
 	change: function(planet) {
 		context_ORBIT.clearRect(0,0,WIDTH,HEIGHT);
 		this.planet = planet;
-		context_TEXT.clearRect(10,45,160,20);
+		context_TEXT.clearRect(10,45,200,20);
 		this.draw();
 	},
 	draw: function() {
@@ -273,7 +273,7 @@ var vector = {
 };
 
 // Controls
-var CONTROL = {
+var BUTTON = {
 	draw_ORBIT: {
 		state: false,
 		draw: function() {
@@ -294,6 +294,41 @@ var CONTROL = {
 		},
 		switch: function() {
 			this.state = !this.state;
+			this.draw();
+		}
+	},
+	draw_TIMELINE: {
+		state: true,
+		draw: function() {
+			context_CONTROL.clearRect(WIDTH/2 - 180,HEIGHT-240,360,240);
+			let sy = 80;
+			if (this.state) {sy = 0;}
+			var img_TIMELINE = new Image();
+			var img_INFO = new Image();
+			img_TIMELINE.onload = function() {
+				context_CONTROL.drawImage(img_TIMELINE,0,sy,320,80,WIDTH/2-160,HEIGHT-100,320,80);
+			};
+			img_TIMELINE.onerror = function() {
+				console.log('failed to load !');
+			};
+			img_TIMELINE.src = 'img/control.png';
+			img_INFO.onload = function() {
+				context_CONTROL.drawImage(img_INFO,WIDTH/2-120,HEIGHT-160,240,60);
+			};
+			img_INFO.onerror = function() {
+				console.log('failed to load !');
+			};
+			img_INFO.src = 'img/info.png';
+		},
+		switch: function() {
+			this.state = !this.state;
+			if (this.state) {
+				TIME.dT_memory = TIME.dT;
+				TIME.dT = 0;
+			}
+			else {
+				TIME.dT = TIME.dT_memory;
+			}
 			this.draw();
 		}
 	}
