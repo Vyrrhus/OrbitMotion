@@ -108,6 +108,14 @@ var PX 	= {
 		context_TEXT.font = "13px Arial";
 		context_TEXT.fillStyle = "#BBB";
 		context_TEXT.fillText(value, WIDTH-length/2-x-size/2, HEIGHT-y+15);
+		
+		context_TEXT.beginPath();
+		context_TEXT.moveTo(WIDTH-x+length*(ZOOM.num/85-1), HEIGHT-y);
+		context_TEXT.lineTo(WIDTH-x+length*(ZOOM.num/85-1)-5, HEIGHT-y-10);
+		context_TEXT.lineTo(WIDTH-x+length*(ZOOM.num/85-1)+5, HEIGHT-y-10);
+		context_TEXT.fillStyle = "#BBB";
+		context_TEXT.fill();
+		context_TEXT.closePath();
 	}
 }
 	
