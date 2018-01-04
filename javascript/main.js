@@ -19,6 +19,8 @@ window.onload = function() {
 		FOCUS.draw();
 		PX.scale(20,30);
 		BUTTON.draw_ORBIT.draw();
+		BUTTON.draw_INFO.draw();
+		BUTTON.draw_TIMELINE.size = 40 + WIDTH/100;
 		BUTTON.draw_TIMELINE.draw();
 	}
 }
