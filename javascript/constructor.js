@@ -91,6 +91,35 @@ function _planet(NAME, MASS, RADIUS, COLOR, ORBIT) {
 				context_ANIMATION.fillText(this.name, X - 3*this.name.length, Y-px_RADIUS - 5);
 			}
 		}
+		if (BUTTON.draw_INFO.state && this == FOCUS.planet) {
+			let text;
+			context_TEXT.clearRect(WIDTH-200,0,300,500);
+			context_TEXT.beginPath();
+			context_TEXT.rect(WIDTH-150,40,130,1);
+			context_TEXT.rect(WIDTH-150,90,130,1);
+			context_TEXT.rect(WIDTH-150,140,130,1);
+			context_TEXT.fill();
+			context_TEXT.closePath();
+			
+			context_TEXT.font = "16px Arial";
+			context_TEXT.fillStyle = "#BBB";
+			context_TEXT.fillText(this.name,WIDTH-145,30);
+			
+			context_TEXT.font = "13px Arial";
+			context_TEXT.fillText("mass:   " + this.mass + " kg",WIDTH-145,55);
+			context_TEXT.fillText("radius:  " + this.radius + " km",WIDTH-145,70);
+			if (this.nb_child == 0) {text="none";}
+			else {text = this.nb_child; }
+			context_TEXT.fillText("satellites: " + text,WIDTH-145,85);
+			if (this.orbit != null) {
+				text = Math.round(this.orbit.angle * 100)/100;
+				context_TEXT.fillText("angle:    " + text + " °", WIDTH-145,155);
+				text = Math.round(vector.module([this.orbit.velocity.x, this.orbit.velocity.y, this.orbit.velocity.z])*100)/100;
+				context_TEXT.fillText("velocity: " + text + " km/s", WIDTH-145,170);
+			}
+			
+			
+		}
 	}
 }
 
