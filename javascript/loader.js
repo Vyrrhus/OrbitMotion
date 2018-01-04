@@ -54,9 +54,6 @@ var FOCUS = {
 		context_TEXT.fillStyle = "#BBB";
 		context_TEXT.fillText("Focus on : " + this.planet.name, 10, 60);
 		context_TEXT.clearRect(WIDTH/2-200,HEIGHT-150,400,150);
-		context_TEXT.font = "24px Arial";
-		context_TEXT.fillStyle = "#000";
-		context_TEXT.fillText(FOCUS.planet.name,WIDTH/2-FOCUS.planet.name.length*8, HEIGHT-110);
 	}
 };
 var ZOOM = {
@@ -69,7 +66,7 @@ var ZOOM = {
 			return Math.floor(x/9);
 		}
 		else {
-			return Math.floor((x-1)/9) - 7;
+			return Math.floor((x-1)/9) - 8;
 		}
 	},
 	b: function(x) {
@@ -93,8 +90,8 @@ var PX 	= {
 		PX.value = ZOOM.value / Math.min(WIDTH, HEIGHT);
 	},
 	scale: function(x,y) {
-		let length = Math.min(WIDTH, HEIGHT)/10;
-		let value = Math.round(PX.value/ZOOM.unit*length*100)/100;
+		let length = Math.min(WIDTH, HEIGHT)/5;
+		let value = Math.round(PX.value/ZOOM.unit*length*1000)/1000;
 		value = value.toString() + ZOOM.unit_name;
 		let size = 7* value.length;
 		context_TEXT.clearRect(WIDTH-x-length-5,HEIGHT-y-10,x+length+5,y+10);
@@ -110,9 +107,9 @@ var PX 	= {
 		context_TEXT.fillText(value, WIDTH-length/2-x-size/2, HEIGHT-y+15);
 		
 		context_TEXT.beginPath();
-		context_TEXT.moveTo(WIDTH-x+length*(ZOOM.num/85-1), HEIGHT-y);
-		context_TEXT.lineTo(WIDTH-x+length*(ZOOM.num/85-1)-5, HEIGHT-y-10);
-		context_TEXT.lineTo(WIDTH-x+length*(ZOOM.num/85-1)+5, HEIGHT-y-10);
+		context_TEXT.moveTo(WIDTH-x+length*(ZOOM.num/92-1), HEIGHT-y);
+		context_TEXT.lineTo(WIDTH-x+length*(ZOOM.num/92-1)-5, HEIGHT-y-10);
+		context_TEXT.lineTo(WIDTH-x+length*(ZOOM.num/92-1)+5, HEIGHT-y-10);
 		context_TEXT.fillStyle = "#BBB";
 		context_TEXT.fill();
 		context_TEXT.closePath();
@@ -306,46 +303,172 @@ var BUTTON = {
 		},
 		switch: function() {
 			this.state = !this.state;
+			if (!this.state) {
+				context_ORBIT.clearRect(0,0,WIDTH,HEIGHT);
+			}
+			this.draw();
+		}
+	},
+	draw_INFO: {
+		state: false,
+		characteristics: true,
+		elements: false,
+		vector: false,
+		draw: function() {
+			context_CONTROL.clearRect(10, 100, 200, 80);
+			let x0 = 0; let x1 = 0; let x2 = 0; let x3 = 0;
+			if (this.state) {x0 = 15;}
+			if (this.characteristics) {x1 = 15;}
+			if (this.elements) {x2 = 15;}
+			if (this.vector) {x3 = 15;}
+			var img_BUTTON = new Image();
+			img_BUTTON.onload = function() {
+				context_CONTROL.drawImage(img_BUTTON,x0,0,15,15,15,100,15,15);
+				context_CONTROL.font = '13px Arial';
+				context_CONTROL.fillStyle = "#BBB";
+				context_CONTROL.fillText('Show informations', 33, 113);
+				if (BUTTON.draw_INFO.state) {
+					context_CONTROL.drawImage(img_BUTTON,x1,0,15,15,35,120,15,15);
+					context_CONTROL.fillText('Characteristics',53,133);
+					context_CONTROL.drawImage(img_BUTTON,x2,0,15,15,35,140,15,15);
+					context_CONTROL.fillText('Orbital elements',53,153);
+					context_CONTROL.drawImage(img_BUTTON,x3,0,15,15,35,160,15,15);
+					context_CONTROL.fillText('State vector',53,173);
+				}
+			};
+			img_BUTTON.onerror = function() {
+			console.log('failed to load !');
+			};
+			img_BUTTON.src = 'img/orbit.png';
+		},
+		switch: function() {
+			this.state = !this.state;
 			this.draw();
 		}
 	},
 	draw_TIMELINE: {
-		state: true,
-		draw: function() {
-			context_CONTROL.clearRect(WIDTH/2 - 180,HEIGHT-240,360,240);
-			let sy = 80;
-			if (this.state) {sy = 0;}
-			var img_TIMELINE = new Image();
-			var img_INFO = new Image();
-			img_TIMELINE.onload = function() {
-				context_CONTROL.drawImage(img_TIMELINE,0,sy,320,80,WIDTH/2-160,HEIGHT-100,320,80);
-			};
-			img_TIMELINE.onerror = function() {
-				console.log('failed to load !');
-			};
-			img_TIMELINE.src = 'img/control.png';
-			img_INFO.onload = function() {
-				context_CONTROL.drawImage(img_INFO,WIDTH/2-120,HEIGHT-160,240,60);
-			};
-			img_INFO.onerror = function() {
-				console.log('failed to load !');
-			};
-			img_INFO.src = 'img/info.png';
+		size: 60, 
+		play_pause: {
+			X: WIDTH/2 - this.size,
+			Y: HEIGHT- this.size * 4/3,
+			state: false,
+			pause: false,
+			draw: function() {
+				let posX = this.X;
+				let posY = this.Y;
+				context_CONTROL.clearRect(posX, posY, BUTTON.draw_TIMELINE.size, BUTTON.draw_TIMELINE.size);
+				var row = 0;
+				var sx = 60;
+				if (this.state) {row=1;}
+				if (this.pause) {sx = 240;}
+				var img_button = new Image();
+				img_button.onload = function() {
+					context_CONTROL.drawImage(img_button,sx,60*row,60,60,posX,posY,BUTTON.draw_TIMELINE.size,BUTTON.draw_TIMELINE.size);
+				}
+				img_button.onerror = function() {
+					console.log('failed to load !');
+				}
+				img_button.src = 'img/control.png';
+			},
+			switch: function() {
+				this.pause = !this.pause;
+				if (!this.pause) {
+					TIME.dT_memory = TIME.dT;
+					TIME.dT = 0;
+				}
+				else {
+					TIME.dT = TIME.dT_memory;
+				}
+			},
+			resize: function() {
+				this.X = WIDTH/2 - BUTTON.draw_TIMELINE.size;
+				this.Y = HEIGHT - 4/3*BUTTON.draw_TIMELINE.size;
+			}
 		},
-		switch: function() {
-			this.state = !this.state;
-			if (this.state) {
-				TIME.dT_memory = TIME.dT;
-				TIME.dT = 0;
+		stop: {
+			X: WIDTH/2,
+			Y: HEIGHT-this.size * 4/3,
+			state: false,
+			draw: function() {
+				let posX = this.X;
+				let posY = this.Y;
+				context_CONTROL.clearRect(posX, posY, BUTTON.draw_TIMELINE.size, BUTTON.draw_TIMELINE.size);
+				var row = 0;
+				if (this.state) {row=1;}
+				var img_button = new Image();
+				img_button.onload = function() {
+					context_CONTROL.drawImage(img_button,120,60*row,60,60,posX,posY,BUTTON.draw_TIMELINE.size,BUTTON.draw_TIMELINE.size);
+				}
+				img_button.onerror = function() {
+					console.log('failed to load !');
+				}
+				img_button.src = 'img/control.png';
+			},
+			resize: function() {
+				this.X = WIDTH/2 ;
+				this.Y = HEIGHT - 4/3*BUTTON.draw_TIMELINE.size;
 			}
-			else {
-				TIME.dT = TIME.dT_memory;
+		},
+		fast_forward: {
+			X: WIDTH/2 + this.size,
+			Y: HEIGHT-this.size * 4/3,
+			state: false,
+			draw: function() {
+				let posX = this.X;
+				let posY = this.Y;
+				context_CONTROL.clearRect(posX, posY, BUTTON.draw_TIMELINE.size, BUTTON.draw_TIMELINE.size);
+				var row = 0;
+				if (this.state) {row=1;}
+				var img_button = new Image();
+				img_button.onload = function() {
+					context_CONTROL.drawImage(img_button,180,60*row,60,60,posX,posY,BUTTON.draw_TIMELINE.size,BUTTON.draw_TIMELINE.size);
+				}
+				img_button.onerror = function() {
+					console.log('failed to load !');
+				}
+				img_button.src = 'img/control.png';
+			},
+			resize: function() {
+				this.X = WIDTH/2 +BUTTON.draw_TIMELINE.size;
+				this.Y = HEIGHT - 4/3*BUTTON.draw_TIMELINE.size;
 			}
-			this.draw();
+		},
+		rewind: {
+			X: WIDTH/2 - 2*this.size,
+			Y: HEIGHT - this.size * 4/3,
+			state: false,
+			draw: function() {
+				let posX = this.X;
+				let posY = this.Y;
+				context_CONTROL.clearRect(posX, posY, BUTTON.draw_TIMELINE.size, BUTTON.draw_TIMELINE.size);
+				var row = 0;
+				if (this.state) {row=1;}
+				var img_button = new Image();
+				img_button.onload = function() {
+					context_CONTROL.drawImage(img_button,0,60*row,60,60,posX,posY,BUTTON.draw_TIMELINE.size,BUTTON.draw_TIMELINE.size);
+				}
+				img_button.onerror = function() {
+					console.log('failed to load !');
+				}
+				img_button.src = 'img/control.png';
+			},
+			resize: function() {
+				this.X = WIDTH/2 - 2 * BUTTON.draw_TIMELINE.size;
+				this.Y = HEIGHT - 4/3*BUTTON.draw_TIMELINE.size;
+			}
+		},
+		draw: function () {
+			this.fast_forward.resize();
+			this.fast_forward.draw();
+			this.stop.resize();
+			this.stop.draw();
+			this.play_pause.resize();
+			this.play_pause.draw();
+			this.rewind.resize();
+			this.rewind.draw();
 		}
 	}
 };
-
 /*
 	Use canonical units 1 ER = R+, TU = 806.8s, mu+ = 1 :
 	- reduce size of numbers
