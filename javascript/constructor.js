@@ -71,51 +71,51 @@ function _planet(NAME, MASS, RADIUS, COLOR, ORBIT) {
 			}
 		}
 		if (this.visible) {
-			context_ANIMATION.beginPath();
-			context_ANIMATION.arc(X, Y, px_RADIUS, 0, Math.PI * 2);
-			context_ANIMATION.fillStyle = COLOR;
-			context_ANIMATION.fill();
-			context_ANIMATION.closePath();
+			CONTEXT.ANIMATION.beginPath();
+			CONTEXT.ANIMATION.arc(X, Y, px_RADIUS, 0, Math.PI * 2);
+			CONTEXT.ANIMATION.fillStyle = COLOR;
+			CONTEXT.ANIMATION.fill();
+			CONTEXT.ANIMATION.closePath();
 			
 			if (BUTTON.draw_ORBIT.state) {
-				context_ORBIT.beginPath();
-				context_ORBIT.rect(X, Y, 1, 1);
-				context_ORBIT.fillStyle = COLOR;
-				context_ORBIT.fill();
-				context_ORBIT.closePath();
+				CONTEXT.ORBIT.beginPath();
+				CONTEXT.ORBIT.rect(X, Y, 1, 1);
+				CONTEXT.ORBIT.fillStyle = COLOR;
+				CONTEXT.ORBIT.fill();
+				CONTEXT.ORBIT.closePath();
 				/* That draw only one point ; if we zoom, we'll have to redraw each and every of these points within the boundaries (WIDTH & HEIGHT)*/
 			}
 			if (this.legend && (this.orbit == null || !(Math.abs(this.x - this.orbit.parent.x) < 30 && Math.abs(this.y - this.orbit.parent.y) < 30))) {
-				context_ANIMATION.font = '10px Arial';
-				context_ANIMATION.fillStyle = "#BBB";
-				context_ANIMATION.fillText(this.name, X - 3*this.name.length, Y-px_RADIUS - 5);
+				CONTEXT.ANIMATION.font = '10px Arial';
+				CONTEXT.ANIMATION.fillStyle = "#BBB";
+				CONTEXT.ANIMATION.fillText(this.name, X - 3*this.name.length, Y-px_RADIUS - 5);
 			}
 		}
 		if (BUTTON.draw_INFO.state && this == FOCUS.planet) {
 			let text;
-			context_TEXT.clearRect(WIDTH-200,0,300,500);
-			context_TEXT.beginPath();
-			context_TEXT.rect(WIDTH-150,40,130,1);
-			context_TEXT.rect(WIDTH-150,90,130,1);
-			context_TEXT.rect(WIDTH-150,140,130,1);
-			context_TEXT.fill();
-			context_TEXT.closePath();
+			CONTEXT.TEXT.clearRect(WIDTH-200,0,300,500);
+			CONTEXT.TEXT.beginPath();
+			CONTEXT.TEXT.rect(WIDTH-150,40,130,1);
+			CONTEXT.TEXT.rect(WIDTH-150,90,130,1);
+			CONTEXT.TEXT.rect(WIDTH-150,140,130,1);
+			CONTEXT.TEXT.fill();
+			CONTEXT.TEXT.closePath();
 			
-			context_TEXT.font = "16px Arial";
-			context_TEXT.fillStyle = "#BBB";
-			context_TEXT.fillText(this.name,WIDTH-145,30);
+			CONTEXT.TEXT.font = "16px Arial";
+			CONTEXT.TEXT.fillStyle = "#BBB";
+			CONTEXT.TEXT.fillText(this.name,WIDTH-145,30);
 			
-			context_TEXT.font = "13px Arial";
-			context_TEXT.fillText("mass:   " + this.mass + " kg",WIDTH-145,55);
-			context_TEXT.fillText("radius:  " + this.radius + " km",WIDTH-145,70);
+			CONTEXT.TEXT.font = "13px Arial";
+			CONTEXT.TEXT.fillText("mass:   " + this.mass + " kg",WIDTH-145,55);
+			CONTEXT.TEXT.fillText("radius:  " + this.radius + " km",WIDTH-145,70);
 			if (this.nb_child == 0) {text="none";}
 			else {text = this.nb_child; }
-			context_TEXT.fillText("satellites: " + text,WIDTH-145,85);
+			CONTEXT.TEXT.fillText("satellites: " + text,WIDTH-145,85);
 			if (this.orbit != null) {
 				text = Math.round(this.orbit.angle * 100)/100;
-				context_TEXT.fillText("angle:    " + text + " °", WIDTH-145,155);
+				CONTEXT.TEXT.fillText("angle:    " + text + " °", WIDTH-145,155);
 				text = Math.round(vector.module([this.orbit.velocity.x, this.orbit.velocity.y, this.orbit.velocity.z])*100)/100;
-				context_TEXT.fillText("velocity: " + text + " km/s", WIDTH-145,170);
+				CONTEXT.TEXT.fillText("velocity: " + text + " km/s", WIDTH-145,170);
 			}
 			
 			
