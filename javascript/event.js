@@ -28,7 +28,7 @@ document.addEventListener('keypress', function(event) {
 	if (event.key === '0') {
 		RUNNING = false;
 		TIME.dT = - TIME.value;
-		context_ORBIT.clearRect(0,0,WIDTH,HEIGHT);
+		CONTEXT.ORBIT.clearRect(0,0,WIDTH,HEIGHT);
 		draw();
 		TIME.dT = 3600;
 		RUNNING = true;
@@ -47,7 +47,7 @@ document.addEventListener('wheel', function(event) {
 	ZOOM.value = ZOOM.b(ZOOM.num) * Math.pow(10,ZOOM.a(ZOOM.num)) * ZOOM.unit;
 	PX.set();
 	PX.scale(20,30);
-	context_ORBIT.clearRect(0,0,WIDTH,HEIGHT);
+	CONTEXT.ORBIT.clearRect(0,0,WIDTH,HEIGHT);
 });
 
 document.addEventListener('click', function(event) {
@@ -151,7 +151,7 @@ document.addEventListener('mouseup', function(event) {
 		BUTTON.draw_TIMELINE.stop.state = false;
 		BUTTON.draw_TIMELINE.stop.draw();
 		RUNNING = false;
-		context_ORBIT.clearRect(0,0,WIDTH,HEIGHT);
+		CONTEXT.ORBIT.clearRect(0,0,WIDTH,HEIGHT);
 		TIME.dT = - TIME.value;
 		draw();
 		RUNNING = true;
@@ -172,3 +172,53 @@ document.addEventListener('mouseup', function(event) {
 		else {TIME.dT *= 1.25;}
 	}
 });
+
+// Resize of canvas:
+window.onload = function() {
+	resize();
+	window.addEventListener('resize', resize, false);
+	function resize() {
+		WIDTH  = document.getElementById('body').offsetWidth;
+		HEIGHT = document.getElementById('body').offsetHeight;
+		CENTER = [Math.floor (WIDTH/2),
+				  Math.floor(HEIGHT/2)];
+		resizeCanvas(BACKGROUND,ORBIT,ANIMATION,TEXT,CONTROL);
+		function resizeCanvas() {
+			[].forEach.call(arguments, function(element) {
+				element.width  = WIDTH;
+				element.height = HEIGHT;
+			});
+		}
+		// Function for backgrounds redraw at each resize
+		set_BACKGROUND();
+		FOCUS.draw();
+		PX.scale(20,30);
+		BUTTON.draw_ORBIT.draw();
+		BUTTON.draw_INFO.draw();
+		BUTTON.draw_TIMELINE.size = 40 + WIDTH/100;
+		BUTTON.draw_TIMELINE.draw();
+	}
+}
+
+// Fill canvas with 'background.png'
+function set_BACKGROUND() {
+	var img_BACKGROUND = new Image();
+	img_BACKGROUND.onload = function() {
+		var Y = 0;
+		while (Y < HEIGHT) {
+			fill_width();
+			Y += img_BACKGROUND.height;
+		}
+		function  fill_width() {
+			var X = 0;
+			while (X < WIDTH) {
+				CONTEXT.BACKGROUND.drawImage(img_BACKGROUND, X, Y);
+				X += img_BACKGROUND.width;
+			}
+		}
+	};
+	img_BACKGROUND.onerror = function() {
+		console.log('failed to load !');
+	};
+	img_BACKGROUND.src = 'img/background.png';
+}
