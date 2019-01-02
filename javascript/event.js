@@ -97,3 +97,9 @@ document.addEventListener('keypress', function(event) {
 		}
 	}
 });
+
+document.addEventListener('keyup', function(event) {
+	if (event.keyCode === 32) {
+		PAUSE = !PAUSE;
+	}
+})
