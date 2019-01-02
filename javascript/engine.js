@@ -230,36 +230,6 @@ class Body {
 				console.log(`${this.name} enters ${this.reference.name}'s orbit`);
 			}
 		}
-		
-//		
-//		{
-//			for (var i = 0 ; i < this.orbit.parent.child.length ; i++) {
-//				var child = this.orbit.parent.child[i];
-//				if (child === this) {
-//					return
-//				}
-////				console.log(Body.get_distance(this, child) - child.SOI);
-//				if (Body.get_distance(this, child) <= child.SOI) {
-//					this.position = vect3.sum(1, this.position, -1, child.position);
-//					this.velocity = vect3.sum(1, this.velocity, -1, child.velocity);
-//					this.reference = child;
-//					this.orbit.parent.child.splice(this.orbit.parent.child.indexOf(this), 1);
-//					child.child.push(this);
-//					this.get_orbit(child);
-//				}
-//			}
-//		} else if (this.orbit.parent.orbit !== null) {
-//			console.log(this.abs_position);
-//			var parent = this.orbit.parent.orbit.parent;
-//			this.position = vect3.sum(1, this.position, 1, this.orbit.parent.position);
-//			this.velocity = vect3.sum(1, this.velocity, 1, this.orbit.parent.velocity);
-//			this.reference = parent;
-//			this.orbit.parent.child.splice(this.orbit.parent.child.indexOf(this), 1);
-//			parent.child.push(this);
-//			this.get_orbit(parent);
-//			console.log(this.abs_position);
-//		}
-	
 	}
 	move(list_body, dT) {
 		/*
@@ -735,5 +705,3 @@ class Sketch {
 	*/
 	
 }
-
-// Render class with all and every elements useful for HUD : color, pixel limitation, draw methods, events and so on

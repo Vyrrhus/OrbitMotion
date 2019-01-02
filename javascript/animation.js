@@ -16,15 +16,19 @@ var CONTEXT = {
 var WIDTH = document.getElementById('body').offsetWidth;
 var HEIGHT = document.getElementById('body').offsetHeight;
 var CENTER = [Math.floor(WIDTH/2), Math.floor(HEIGHT/2)];
-var SCALE = {
-	value: 2048,
-	unit: 'km'
-};
+
+// PLANE
 var PLANE = [I, J];
 
-// ANIMATION TIME
+// SCALE
+var SCALE = {
+	value: 1e10,
+	unit: 'km'
+};
+
+// TIME
 var TIME = {
-	dT: 5e3, //[s]
+	dT: 86400/60, //[s]
 	running: true,
 	LAST_TICK: 0,
 	FPS: 0,
@@ -44,10 +48,13 @@ var TIME = {
 	}
 };
 
+// FOCUS
 var FOCUS = {
 	body: null,
 	num: 0
 };
+
+// LIST OF BODIES (STARTING EMPTY)
 var LIST_OBJ = null;
 
 function start() {
@@ -57,9 +64,55 @@ function start() {
 	*/
 	list_body = init()
 	LIST_OBJ = list_body;
-//	FOCUS.body = LIST_OBJ[FOCUS.num];
-	FOCUS.body = LIST_OBJ[2];
+	FOCUS.body = LIST_OBJ[FOCUS.num];
 	requestAnimationFrame(animation);
+	
+	function init() {
+		list_bodies = []
+		for (var element in BODIES) {
+			if (element in VECTORS) {
+				e = VECTORS[element];
+				BODIES[element].init_state(e[0], e[1], e[2], e[3], e[4], e[5]);
+			}
+			list_bodies.push(BODIES[element]);
+		}
+		return set_kepler(list_bodies);
+	}
+	function set_kepler(list_body) {
+		// Sort by mass
+		list_body.sort(function(a,b) {
+			return (b.mass - a.mass)
+		});
+	
+		// Iterate through bodies
+		for (var i = 1 ; i < list_body.length ; i++) {
+			console.log(`+ Add: ${list_body[i].name}`);
+			var reference = list_body[0];
+			for (var j = i-1 ; j > 0 ; j--) {
+				var distance = Body.get_distance(list_body[i], list_body[j]);
+				var SOI = list_body[j].SOI;
+				if (distance < SOI) {
+					// Reference found
+					reference = list_body[j];
+					j = 0;
+				}
+			}
+			// Set children
+			reference.child.push(list_body[i]);
+		
+			// Set state vectors
+			list_body[i].reference = reference;
+			while (reference !== 'inertial') {
+				list_body[i].position = vect3.sum(1,list_body[i].position, -1, reference.position);
+				list_body[i].velocity = vect3.sum(1, list_body[i].velocity, -1, reference.velocity);
+				reference = reference.reference;
+			}
+			list_body[i].get_orbit(list_body[i].reference);
+		}
+	
+		// Return list 
+		return list_body
+	}
 }
 	
 function animation(time) {
@@ -85,103 +138,3 @@ function animation(time) {
 }
 
 start();
-
-// Resize canvas
-window.onload = function() {
-	resize();
-	window.addEventListener('resize', resize, false);
-	
-	function resize() {
-		WIDTH = document.getElementById('body').offsetWidth;
-		HEIGHT = document.getElementById('body').offsetHeight;
-		CENTER = [Math.floor(WIDTH/2), Math.floor(HEIGHT/2)];
-		resizeCanvas(CANVAS);
-		set_background();
-		
-		function resizeCanvas(canvas) {
-			for (element in canvas) {
-				CANVAS[element].width = WIDTH;
-				CANVAS[element].height = HEIGHT;
-			}
-		}
-		function set_background() {
-			var img = new Image();
-			img.onload = function() {
-				var Y = 0;
-				while (Y < HEIGHT) {
-					fill_width();
-					Y += img.height;
-				}
-				function fill_width() {
-					var X = 0;
-					while (X < WIDTH) {
-						CONTEXT.BACKGROUND.drawImage(img, X, Y);
-						X += img.width;
-					}
-				}
-			};
-			img.onerror = function() {
-				console.log('background loading failed !');
-			};
-			img.src = 'img/background.png';
-		}
-	}
-};
-
-// Zoom
-document.addEventListener('wheel', function(event) {
-	SCALE.value *= (1 + Math.sign(event.deltaY) * 5/100) ;
-	if (SCALE.value < 1) {SCALE.value =1}
-	CONTEXT.TRAJECTORY.clearRect(0,0,WIDTH,HEIGHT);
-	for (var i = 0 ; i < LIST_OBJ.length ; i++) {
-		LIST_OBJ[i].sketch.draw_stored_position(CONTEXT.TRAJECTORY, CENTER, SCALE.value, SCALE.unit, FOCUS.body, PLANE);	
-	}
-});
-
-// Event
-document.addEventListener('keypress', function(event) {
-	if (event.key === 'a') {
-		CONTEXT.TRAJECTORY.clearRect(0,0,WIDTH,HEIGHT);
-		for (var i = 0 ; i < LIST_OBJ.length ; i++) {
-			LIST_OBJ[i].sketch.toggle_orbit();
-		}
-	}
-	if (event.key === '+') {
-		TIME.dT *= 1.05;
-	}
-	if (event.key === '-') {
-		TIME.dT *= 0.95;
-	}
-	if (event.key === '(' || event.key === ')') {
-		var sign = 1;
-		if (event.key === '(') {
-			sign *= -1;
-		}
-		FOCUS.num += sign;
-		if (FOCUS.num < 0) {
-			FOCUS.num = LIST_OBJ.length-1;
-		}
-		if (FOCUS.num > LIST_OBJ.length-1) {
-			FOCUS.num = 0;
-		}
-		FOCUS.body = LIST_OBJ[FOCUS.num];
-		CONTEXT.TRAJECTORY.clearRect(0,0,WIDTH,HEIGHT);
-		for (var i = 0 ; i < LIST_OBJ.length ; i++) {
-			LIST_OBJ[i].sketch.reset_store();
-			LIST_OBJ[i].sketch.draw_stored_position(CONTEXT.TRAJECTORY, CENTER, SCALE.value, SCALE.unit, FOCUS.body, PLANE);	
-		}
-		console.log(FOCUS.body.name)
-	}
-	
-	if (event.key === 'z' || event.key === 's') {
-		var angle = 0.3;
-		if (event.key === 's') {angle *= -1}
-		var K = quat.rotate(PLANE[1],angle,I);
-		PLANE = [PLANE[0], K];
-//		console.log(tool.rad_to_deg(Math.acos(vect3.dot(K,J))));
-		CONTEXT.TRAJECTORY.clearRect(0,0,WIDTH,HEIGHT);
-		for (var i = 0 ; i < LIST_OBJ.length ; i++) {
-			LIST_OBJ[i].sketch.draw_stored_position(CONTEXT.TRAJECTORY, CENTER, SCALE.value, SCALE.unit, FOCUS.body, PLANE);
-		}
-	}
-});
