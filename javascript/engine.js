@@ -184,14 +184,6 @@ class Body {
 		this.position = state.r;
 		this.velocity = state.v;
 		
-		if (this === TESTING_BODY) {
-			var v = Math.round(1e2*this.orbit.kepler.v)/1e2;
-			console.log(`${v}° - v = ${this.velocity.module} km/s`);
-			if (v === 0 || v === 360) {
-				console.log('orbit');
-			}
-		}
-		
 		// SOI Checks
 		// 1st check: out of parent SOI (if not around primary object)
 		if (this.orbit.parent.orbit !== null && Body.get_distance(this, this.orbit.parent) >= this.orbit.parent.SOI) {
