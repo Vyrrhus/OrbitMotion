@@ -22,7 +22,7 @@ var PLANE = [I, J];
 
 // SCALE
 var SCALE = {
-	value: 1e10,
+	value: 2e6,
 	unit: 'km'
 };
 
@@ -53,6 +53,9 @@ var FOCUS = {
 	body: null,
 	num: 0
 };
+
+// PAUSE
+var PAUSE = false;
 
 // LIST OF BODIES (STARTING EMPTY)
 var LIST_OBJ = null;
@@ -116,6 +119,9 @@ function start() {
 }
 	
 function animation(time) {
+	if (PAUSE) {
+		return requestAnimationFrame(animation);
+	}
 	CONTEXT.BODY.clearRect(0,0,WIDTH,HEIGHT);
 	
 	for (var i = 0 ; i < LIST_OBJ.length ; i++) {
