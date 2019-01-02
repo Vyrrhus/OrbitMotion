@@ -119,6 +119,13 @@ document.addEventListener('mousedown', function(event) {
 		BUTTON.draw_TIMELINE.fast_forward.draw();
 	}
 	
+	// Test triangle
+	if (mouseY >= HEIGHT - PX.y - 10 && (mouseY-(HEIGHT - PX.y - 10)) <= 2 * (mouseX - (WIDTH - PX.x + PX.length*(ZOOM.num/92-1)-5)) && (mouseY-(HEIGHT - PX.y - 10)) >= 2 * (mouseX - (WIDTH - PX.x + PX.length*(ZOOM.num/92-1)+5))) 
+		{
+		PX.state = true;
+		console.log('triangle caught');
+	}	
+	
 });
 
 document.addEventListener('mouseup', function(event) {
@@ -220,5 +227,5 @@ function set_BACKGROUND() {
 	img_BACKGROUND.onerror = function() {
 		console.log('failed to load !');
 	};
-	img_BACKGROUND.src = 'img/background.png';
+	img_BACKGROUND.src = 'src/img/background.png';
 }

@@ -1,168 +1,10 @@
-// CONSTANTS
-var UA 	= 149597870.7; 							// km
-var G 	= 6.67408e-20; 							// m3/kg/s2
-
-// Inertial coordinate frame
-var I = [1,0,0];
-var J = [0,1,0];
-var K = [0,0,1];
-
-// SI Units functions
-function km_to_UA(value) {
-	return value / UA;
-}
-function UA_to_km(value) {
-	return value * UA;
-}
-function rad_to_deg(value) {
-	return value / Math.PI * 180;
-}
-function deg_to_rad(value) {
-	return value * Math.PI / 180;
-}
-function km_to_px(value) {
-	return value / PX.value;
-}
-
-// Math functions
-function square(value) {
-	return Math.pow(value, 2);
-}
-function cube(value) {
-	return Math.pow(value, 3);
-}
-function newton_raphson(guess, f, df) {
-	if (df(guess) == 0) {return newton_raphson(guess+1, f, df);}
-	let value_i = guess;
-	let value_j = guess;
-	let epsilon = 1e-15;
-	do {
-		value_i = value_j;
-		value_j = value_i - f(value_i) / df(value_i);
-	} while (Math.abs((value_j - value_i) / value_i) > epsilon)
-	return value_j;
-}
-var matrix = {
-	transpose: function(M) {
-		/* Input checking first */
-		let size_i = M.length;
-		if (size_i == undefined) {return M;}
-		let size_j = M[0].length;
-		if (size_j == 1 && size_i == 1) {return M;}
-		if (size_j == 0 || size_i == 0) {return null;}
-		
-		/* Transposition */
-		let result = [];
-		if (size_j > 0) {
-			for (let j = 0 ; j < size_j ; j++) {
-				let line = [];
-				for (let i = 0 ; i < size_i ; i++) {
-					line.push(M[i][j]);
-				}
-				result.push(line);
-			}
-		}
-		else {
-			for (let k = 0 ; k < size_i ; k++) {
-				result.push([M[k]]);
-			}
-		}
-		if (size_j == 1) {
-			return result[0];
-		}
-		return result;
-	},
-	product: function(A, B) {
-		// Input checking
-		let size_A = A.length;
-		let size_B = B.length;
-		for (let k = 1 ; k < size_A ; k++) {
-			if (A[k].length != A[0].length) {return null;}
-		}
-		for (let k = 1 ; k < size_B ; k++) {
-			if (B[k].length != B[0].length) {return null;}
-		}
-		if (A[0].length != B.length) {
-			console.log('Dimension error, check your input');
-			return null;
-		}
-		
-		// Initialization
-		let result = [];
-		for (i=0 ; i < A.length ; i++) {
-			let line = [];
-			for (j=0 ; j < B[0].length ; j++) {
-				line.push(0);
-			}
-			result.push(line);
-		}
-		
-		// Product
-		for (let j = 0 ; j < B[0].length ; j++) {
-			for (let i = 0 ; i < A.length ; i++) {
-				let inner_sum = 0;
-				for (let k = 0 ; k < B.length ; k++) {
-					inner_sum += A[i][k] * B[k][j];
-				}
-				result[i][j] = inner_sum;
-			}
-		}
-		return result;
-	}
-};
-var vector = {
-	module: function(v) {
-		let result = 0;
-		for (let k = 0, c = v.length ; k < c ; k++) {
-			result += square(v[k]);
-		}
-		return Math.sqrt(result);
-	},
-	dot: function(u,v) {
-		if (u.length != v.length && u.length != undefined) {
-			console.log('Dimension error, check your inputs');
-			return null;
-		}
-		let result = 0;
-		for (let k = 0, c = u.length ; k < c ; k++) {
-			result += u[k] * v[k];
-		}
-		return result;
-	},
-	cross: function(u,v) {
-		if (u.length != v.length || u.length != 3) {
-			console.log('Dimension error, check your inputs'); 
-			return null;
-		}
-		else {
-			let x = u[1]*v[2] - u[2]*v[1];
-			let y = u[2]*v[0] - u[0]*v[2];
-			let z = u[0]*v[1] - u[1]*v[0];
-			return [x,y,z];
-		}
-		
-	},
-	scalar: function(a,u) {
-		if (a.length > 1) {
-			console.log('Dimension error, check your input'); 
-			return null;
-		}
-		else {
-			let result = u;
-			for (let k = 0, c = u.length ; k < c ; k++) {
-				result[k] *= a;
-			}
-			return result;
-		}
-	}
-};
-
 // Canvas
 var BACKGROUND 	= document.getElementById('background');
 var ORBIT 		= document.getElementById('orbit');
 var ANIMATION 	= document.getElementById('animation');
 var TEXT 		= document.getElementById('text');
 var CONTROL 	= document.getElementById('control');
+var SWITCH = false;
 
 // Contexts
 var CONTEXT = {
@@ -178,8 +20,9 @@ var WIDTH  = document.getElementById('body').offsetWidth;
 var HEIGHT = document.getElementById('body').offsetHeight;
 var CENTER = [Math.floor (WIDTH/2), Math.floor(HEIGHT/2)];
 
-
 // Settings
+var CONFIG = {};
+var CONFIG_LIST = [];
 var RUNNING = true;
 var POSITION = {
 	text: {
@@ -197,7 +40,6 @@ var POSITION = {
 		fontwidth: 7,
 	}
 };
-
 var ZOOM = {
 	value: 1 * UA,
 	unit: UA,
@@ -225,33 +67,38 @@ var PX 	= {
 	set: function() {
 		PX.value = ZOOM.value / Math.min(WIDTH, HEIGHT);
 	},
+	x: 1,
+	y: 1,
+	state: false,
+	length: Math.min(WIDTH,HEIGHT)/5,
 	scale: function(x,y) {
-		let length = Math.min(WIDTH, HEIGHT)/5;
-		let value = Math.round(PX.value/ZOOM.unit*length*1000)/1000;
+		this.x = x;
+		this.y = y;
+		this.length = Math.min(WIDTH, HEIGHT)/5;
+		let value = Math.round(PX.value/ZOOM.unit*this.length*1000)/1000;
 		value = value.toString() + ZOOM.unit_name;
 		let size = 7* value.length;
-		CONTEXT.TEXT.clearRect(WIDTH-x-length-5,HEIGHT-y-10,x+length+5,y+10);
+		CONTEXT.TEXT.clearRect(WIDTH-x-this.length-5,HEIGHT-y-10,x+this.length+5,y+10);
 		CONTEXT.TEXT.beginPath();
-		CONTEXT.TEXT.rect(WIDTH-length-x, HEIGHT-y-5, 1, 10);
+		CONTEXT.TEXT.rect(WIDTH-this.length-x, HEIGHT-y-5, 1, 10);
 		CONTEXT.TEXT.rect(WIDTH-x, HEIGHT-y-5, 1, 10);
-		CONTEXT.TEXT.rect(WIDTH-length-x, HEIGHT-y,length,1);
+		CONTEXT.TEXT.rect(WIDTH-this.length-x, HEIGHT-y,this.length,1);
 		CONTEXT.TEXT.fillStyle = "#BBB";
 		CONTEXT.TEXT.fill();
 		CONTEXT.TEXT.closePath();
 		CONTEXT.TEXT.font = "13px Arial";
 		CONTEXT.TEXT.fillStyle = "#BBB";
-		CONTEXT.TEXT.fillText(value, WIDTH-length/2-x-size/2, HEIGHT-y+15);
+		CONTEXT.TEXT.fillText(value, WIDTH-this.length/2-x-size/2, HEIGHT-y+15);
 		
 		CONTEXT.TEXT.beginPath();
-		CONTEXT.TEXT.moveTo(WIDTH-x+length*(ZOOM.num/92-1), HEIGHT-y);
-		CONTEXT.TEXT.lineTo(WIDTH-x+length*(ZOOM.num/92-1)-5, HEIGHT-y-10);
-		CONTEXT.TEXT.lineTo(WIDTH-x+length*(ZOOM.num/92-1)+5, HEIGHT-y-10);
+		CONTEXT.TEXT.moveTo(WIDTH-x+this.length*(ZOOM.num/92-1), HEIGHT-y);
+		CONTEXT.TEXT.lineTo(WIDTH-x+this.length*(ZOOM.num/92-1)-5, HEIGHT-y-10);
+		CONTEXT.TEXT.lineTo(WIDTH-x+this.length*(ZOOM.num/92-1)+5, HEIGHT-y-10);
 		CONTEXT.TEXT.fillStyle = "#BBB";
 		CONTEXT.TEXT.fill();
 		CONTEXT.TEXT.closePath();
 	}
-}
-
+};
 var TIME = {
 	value: 0,
 	date: '0',
@@ -317,7 +164,7 @@ var BUTTON = {
 			img_BUTTON.onerror = function() {
 			console.log('failed to load !');
 			};
-			img_BUTTON.src = 'img/orbit.png';
+			img_BUTTON.src = 'src/img/orbit.png';
 		},
 		switch: function() {
 			this.state = !this.state;
@@ -357,7 +204,7 @@ var BUTTON = {
 			img_BUTTON.onerror = function() {
 			console.log('failed to load !');
 			};
-			img_BUTTON.src = 'img/orbit.png';
+			img_BUTTON.src = 'src/img/orbit.png';
 		},
 		switch: function() {
 			this.state = !this.state;
@@ -386,7 +233,7 @@ var BUTTON = {
 				img_button.onerror = function() {
 					console.log('failed to load !');
 				}
-				img_button.src = 'img/control.png';
+				img_button.src = 'src/img/control.png';
 			},
 			switch: function() {
 				this.pause = !this.pause;
@@ -420,7 +267,7 @@ var BUTTON = {
 				img_button.onerror = function() {
 					console.log('failed to load !');
 				}
-				img_button.src = 'img/control.png';
+				img_button.src = 'src/img/control.png';
 			},
 			resize: function() {
 				this.X = WIDTH/2 ;
@@ -444,7 +291,7 @@ var BUTTON = {
 				img_button.onerror = function() {
 					console.log('failed to load !');
 				}
-				img_button.src = 'img/control.png';
+				img_button.src = 'src/img/control.png';
 			},
 			resize: function() {
 				this.X = WIDTH/2 +BUTTON.draw_TIMELINE.size;
@@ -468,7 +315,7 @@ var BUTTON = {
 				img_button.onerror = function() {
 					console.log('failed to load !');
 				}
-				img_button.src = 'img/control.png';
+				img_button.src = 'src/img/control.png';
 			},
 			resize: function() {
 				this.X = WIDTH/2 - 2 * BUTTON.draw_TIMELINE.size;
@@ -487,3 +334,81 @@ var BUTTON = {
 		}
 	}
 };
+
+function init() {
+	for (var element in DATA) {
+		element = DATA[element];
+		let orbit = element.orbit;
+		
+		if (!orbit) {
+			CONFIG[element.name] = new Body(element.name,
+										    element.mass,
+										    element.radius,
+										    element.color,
+										    orbit);
+			var body_to_focus = element.name
+		} else {
+			CONFIG[element.name] = new Body(element.name,
+										    element.mass,
+										    element.radius,
+										    element.color,
+										    new Orbit(CONFIG[orbit.body],
+													  orbit.i, orbit.W, 
+													  orbit.a, orbit.e,
+													  orbit.w, orbit.v));
+		}
+	CONFIG_LIST.push(CONFIG[element.name]);
+	}
+	FOCUS.change(CONFIG[body_to_focus]);
+	draw();
+}
+
+function draw() {
+	CONTEXT.ANIMATION.clearRect(0,0,WIDTH,HEIGHT);
+	if (SWITCH) {
+		planet_animation();
+	} else {
+		n_body_animation();
+	}
+	TIME.value += TIME.dT;
+	TIME.draw();
+	FOCUS.planet.setFocus();
+	planet_draw();
+	
+	if (RUNNING) {requestAnimationFrame(draw);}
+}
+
+
+function planet_animation() {
+	for (var element in CONFIG) {
+		element = CONFIG[element];
+		if (element.orbit != null) {
+			element.orbit.motion(TIME.dT);
+		}
+	}
+}
+
+function n_body_animation() {
+	for (var i = 0 ; i < CONFIG_LIST.length ; i++) {
+		for (var j = i+1 ; j < CONFIG_LIST.length ; j++) {
+			get_force(CONFIG_LIST[i], CONFIG_LIST[j]);
+		}
+	}
+	for (var element in CONFIG) {
+		e = CONFIG[element];
+		if (e.orbit !== null) {
+			var acc = vector.scalar(1/e.mass, [e.orbit.force.x, e.orbit.force.y, e.orbit.force.z]);
+			e.orbit.n_body(acc, TIME.dT);
+			e.orbit.force.reset();
+		}
+	}
+}
+
+function planet_draw() {
+	for (var element in CONFIG) {
+		element = CONFIG[element];
+		element.draw();
+	}
+}
+
+init()

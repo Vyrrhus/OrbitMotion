@@ -1,20 +1,9 @@
-/*
-RANK 0
-*/
-{
 var SUN = new _planet('SUN', 
 				  1.9891e30,
 				  6.957e5,
 				  'yellow',
 				  null);
-}
 
-
-/*
-RANK 1
-*/
-// Orbits
-{
 var ORBIT_MERCURY 	= new _orbit(SUN, 
 						   	7.003938621978453, 
 						   	4.830840964417403E+01, 
@@ -22,6 +11,7 @@ var ORBIT_MERCURY 	= new _orbit(SUN,
 						   	2.056385802768018E-01, 
 						   	2.917450639154915E+01, 
 						   	1.034534549156763E+02);
+
 var ORBIT_VENUS 	= new _orbit(SUN,
 							 3.394490723804590E+00, 
 							 7.662845580893872E+01, 
@@ -29,6 +19,7 @@ var ORBIT_VENUS 	= new _orbit(SUN,
 							 6.801883435239245E-03, 
 							 5.476413547432202E+01, 
 							 1.442517569276391E+02);
+
 var ORBIT_EARTH 	= new _orbit(SUN,
 							 1.442517569276391E-02, 
 							 2.109010444915891E+02, 
@@ -36,6 +27,7 @@ var ORBIT_EARTH 	= new _orbit(SUN,
 							 1.578453256417450E-02, 
 							 2.525270024725202E+02, 
 							 3.568366379975838E+02);
+
 var ORBIT_MARS 		= new _orbit(SUN,
 							 1.848339620191774E+00, 
 							 4.950783226093129E+01, 
@@ -83,25 +75,33 @@ var ORBIT_PLUTO 	= new _orbit(SUN,
 							2.522778195718353E-01, 
 							1.127647308059285E+02, 
 							6.264626398677877E+01);
-}
 
-// Planets
-{
+var ORBIT_HALLEY 	= new _orbit(SUN,
+							162.262690579161,
+							58.42008097656843,
+							17.8341442925537,
+							0.967142908462304,
+							111.3324851045177,
+							38.3842644764388);
+
 var MERCURY = new _planet(	'MERCURY',
 					  		0.330104e24,
 					  		2439.7,
 					  		'#929292',
 					  		ORBIT_MERCURY);
+
 var VENUS 	= new _planet(	'VENUS', 
 				    		4.86732e24,
 				    		6051.8,
 				    		'#dabeac',
 				    		ORBIT_VENUS);
+
 var EARTH 	= new _planet(	'EARTH',
 				    		5.97219e24,
 				    		6371.009,
 				    		'#5880b8',
 				    		ORBIT_EARTH);
+
 var MARS 	= new _planet(	'MARS',
 				   			0.641693e24,
 				   			3389.5,
@@ -113,16 +113,19 @@ var JUPITER = new _planet(	'JUPITER',
 				   			69911,
 				   			'#a98723',
 				   			ORBIT_JUPITER);
+
 var SATURN = new _planet(	'SATURNE',
 				   			568.319e24,
 				  		 	58232,
 				   			'#f7e4c8',
 				   			ORBIT_SATURN);
+
 var URANUS 	= new _planet(	'URANUS',
 				   			86.8103e24,
 				   			25362,
 				   			'#b0b2c8',
 				   			ORBIT_URANUS);
+
 var NEPTUNE = new _planet(	'NEPTUNE',
 				   			102.410e24,
 				   			24622,
@@ -134,13 +137,7 @@ var PLUTO = new _planet(	'PLUTO',
 					   		1151,
 					   		'#DEB48E',
 					   		ORBIT_PLUTO);
-}
 
-/* 
-RANK 2
-*/
-// Orbits
-{
 var ORBIT_MOON 	= new _orbit(EARTH, 
 						5.196960685321760E+00, 
 						1.351208912106474E+02, 
@@ -180,10 +177,7 @@ var ORBIT_ENCELADUS = new _orbit(SATURN,
 						6.417148409504786E-03, 
 						1.926819986280434E+02, 
 						2.280121924070831E-01);
-}
 
-// Planets
-{
 var MOON 	 = new _planet(	'MOON',
 					  		7.3477e22,
 					  		1737.5,
@@ -213,9 +207,72 @@ var ENCELADUS = new _planet('ENCELADUS',
 						   252.1,
 						   '#EDEDED',
 						   ORBIT_ENCELADUS);
-}
 
-/*
-ALL
-*/
-var DATA = [SUN, MERCURY, VENUS, EARTH, MOON, MARS, JUPITER, IO, EUROPA, GANYMEDE, SATURN, ENCELADUS, URANUS, NEPTUNE, PLUTO];
+var HALLEY  = new _planet(	'HALLEY',
+						 	5,
+						 	100,
+						 	'#FFF',
+						 	ORBIT_HALLEY);
+
+var ENCKE 	= new _planet(	'ENCKE',
+						 	5,
+						 	100,
+						 	'#CCC',
+						 	new _orbit(SUN,
+									   11.78183005207527,
+									   334.5678392905074,
+									   2.215134573264697,
+									   0.8483251746071773,
+									   186.5437009154704,
+									   143.2720471022976));
+
+var BIELA 	= new _planet(	'BIELA',
+						 	5,
+						 	100,
+						 	'#AAA',
+						 	new _orbit(SUN,
+									   13.2164,
+									   250.669,
+									   3.53465808340135,
+									   0.751299,
+									   221.6588,
+									   0.9469569963959761));
+
+var FAYE 	= new _planet(	'FAYE',
+						 	5,
+						 	100,
+						 	'#888',
+						 	new _orbit(SUN,
+									   9.070294510274881,
+									   199.143982411512,
+									   3.83815915788662,
+									   0.5696175496849397,
+									   205.1258177176394,
+									   59.65629669645756));
+
+var BRORSEN = new _planet(	'BRORSEN',
+						 	5,
+						 	100,
+						 	'#555',
+						 	new _orbit(SUN,
+									   29.3821,
+									   102.9676,
+									   3.10112826228681,
+									   0.809796,
+									   14.9468,
+									   0.1743237848212893));
+
+var CHURYUMOV = new _planet('CHURYUMOV',
+						 	5,
+						 	100,
+						 	'#333',
+						 	new _orbit(SUN,
+									   2.500194171253696,
+									   109.5977615931609,
+									   3.106510726920444,
+									   0.1755262934192068,
+									   314.4202377949332,
+									   83.75840147746375));
+
+
+var DATA = [SUN, MERCURY, VENUS, EARTH, MOON, MARS, JUPITER, IO, EUROPA, GANYMEDE, SATURN, ENCELADUS, URANUS, NEPTUNE, PLUTO, HALLEY, ENCKE, BIELA, FAYE, BRORSEN, CHURYUMOV];

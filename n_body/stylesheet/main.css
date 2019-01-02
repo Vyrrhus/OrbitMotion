@@ -1,0 +1,24 @@
+* { margin: 0; padding: 0;}
+
+body, html { height:100%; }
+
+#background, #orbit, #animation {
+    position:absolute;
+}
+
+#background {
+	z-index: 0;
+}
+#orbit {
+	z-index: 1;
+}
+#animation {
+	z-index: 2;
+}
+/*
+#text {
+	z-index: 4;
+}
+#control {
+	z-index: 3;
+}*/

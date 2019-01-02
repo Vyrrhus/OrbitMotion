@@ -1,5 +1,5 @@
 // Planet class
-function _planet(NAME, MASS, RADIUS, COLOR, ORBIT) {
+function Body(NAME, MASS, RADIUS, COLOR, ORBIT) {
 	// self
 	var self = this;
 	
@@ -26,6 +26,11 @@ function _planet(NAME, MASS, RADIUS, COLOR, ORBIT) {
 	if (this.rank != 0) {
 		this.orbit.parent.nb_child++;
 	}
+	
+	// n-body parameters
+	this.state = 'kepler' // kepler, n-body
+	this.position = [0,0,0];
+	this.velocity = [0,0,0];
 	
 	// Drawing
 	this.x = 0;
@@ -88,7 +93,7 @@ function _planet(NAME, MASS, RADIUS, COLOR, ORBIT) {
 			if (this.legend && (this.orbit == null || !(Math.abs(this.x - this.orbit.parent.x) < 30 && Math.abs(this.y - this.orbit.parent.y) < 30))) {
 				CONTEXT.ANIMATION.font = '10px Arial';
 				CONTEXT.ANIMATION.fillStyle = "#BBB";
-				CONTEXT.ANIMATION.fillText(this.name, X - 3*this.name.length, Y-px_RADIUS - 5);
+				CONTEXT.ANIMATION.fillText(this.name, X - 3*this.name.length, Y-px_RADIUS*1.05-5);
 			}
 		}
 		if (BUTTON.draw_INFO.state && this == FOCUS.planet) {
@@ -124,7 +129,7 @@ function _planet(NAME, MASS, RADIUS, COLOR, ORBIT) {
 }
 
 // Orbit class - we only consider ellipse here (for now)
-function _orbit(PARENT, INCLINATION, NA_LONGITUDE, SEMI_MAJOR_AXIS, ECCENTRICITY, ARGUMENT, ANOMALY_0) {
+function Orbit(PARENT, INCLINATION, NA_LONGITUDE, SEMI_MAJOR_AXIS, ECCENTRICITY, ARGUMENT, ANOMALY_0) {
 	// self
 	var self = this;
 	
@@ -188,6 +193,17 @@ function _orbit(PARENT, INCLINATION, NA_LONGITUDE, SEMI_MAJOR_AXIS, ECCENTRICITY
 		}
 	};
 	
+	this.force = {
+		x: 0,
+		y: 0,
+		z: 0,
+		reset: function() {
+			this.x = 0;
+			this.y = 0;
+			this.z = 0;
+		}
+	}
+	
 	this.motion 	= function(time) {
 		/* 	This algorithm doesn't take account of the changes in the above elements through time
 			Function needed for that.
@@ -212,7 +228,11 @@ function _orbit(PARENT, INCLINATION, NA_LONGITUDE, SEMI_MAJOR_AXIS, ECCENTRICITY
 		// We then consider the resulting mean anomaly and deduce the true anomaly in output :
 		mean_anomaly = (mean_anomaly + delta_M) % 360;
 		mean_anomaly = deg_to_rad(mean_anomaly);
-		let eccentric_anomaly = newton_raphson(0, F, dF);
+		let E0 = mean_anomaly + self.e;
+		if (mean_anomaly > Math.PI) {
+			E0 = mean_anomaly - self.e;
+		}
+		let eccentric_anomaly = newton_raphson(E0, F, dF);
 		function F(x) {
 			return x - self.e * Math.sin(x) - mean_anomaly;
 		}
@@ -264,6 +284,21 @@ function _orbit(PARENT, INCLINATION, NA_LONGITUDE, SEMI_MAJOR_AXIS, ECCENTRICITY
 		let v_centered = matrix.product(DCM, v_perifocal);
 		this.position.fill(r_centered);
 		this.velocity.fill(v_centered);
+	}
+	this.n_body		= function(acc, dT) {
+		/*
+			A terme il serait utile de pouvoir passer d'une méthode à l'autre en procédant au calcul inverse : éléments képlériens à partir des paramètres d'état (position, vitesse).
+			La difficulté sera de déterminer le corps attracteur en accord avec le principe des sphères d'influence.
+		*/
+		var velocity = [[this.velocity.x + acc[0]*dT], 
+						[this.velocity.y + acc[1]*dT], 
+						[this.velocity.z + acc[2]*dT]];
+		var position = [[this.position.x + (velocity[0][0] + this.velocity.x)/2 * dT],
+					    [this.position.y + (velocity[1][0] + this.velocity.y)/2 * dT],
+					    [this.position.z + (velocity[2][0] + this.velocity.z)/2 * dT]];
+		console.log(position)
+		this.velocity.fill(velocity);
+		this.position.fill(position);
 	}
 	this.motion(0);
 	// Write down the function to make the planet MOOVE along its orbit => X, Y, Z as with the ANGLE
