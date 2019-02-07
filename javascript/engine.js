@@ -147,7 +147,7 @@ class Body {
 		
 		this.orbit = new Orbit(central_body, i, W, e.module, a, w, TA, {h: h.module, E: E, w_true: w_true, u: u, l_true: l});
 	}
-	kepler_motion(dT, TESTING_BODY) {
+	kepler_motion(dT) {
 		if (this.orbit === null) {
 			return
 		}
@@ -536,12 +536,14 @@ class Sketch {
 		this.color 			= self.color;	// element color
 		this.font 			= '10px Arial';	// font for label
 		this.color_font		= '#BBB';		// color for font
-		
-		this.visible 		= true;			// body visible or not
-		this.legend 		= true;			// label visible or not
-		this.infobox 		= false;		// orbit informations displayed or not
-		this.show_SOI		= true;		// show SOI
-		this.show_orbit 	= false;		// show orbit
+		this.show = {
+			body: 		true,
+			label: 		true,
+			infobox: 	false,
+			SOI: 		true,
+			orbit: 		false,
+			vector: 	false
+		};
 		this.store_orbit 	= false;		// if true, store orbit data to display it on zoom / focus change
 		this.min_radius		= 5;			// minimum pixel to display on screen
 		
@@ -553,49 +555,52 @@ class Sketch {
 			y: 0
 		}
 		this.store = [];
+		this.max_length = 500;
 	}
 	
 	// Methods
-	draw(context_body, context_path) {
+	draw(ctx_body, ctx_path) {
 		/*
 			Draw body on canvas, labels & orbit path
 		*/
 		
 		// Not showing
-		if (!this.visible) {
+		if (!this.show.body) {
 			return	
 		}
 		
 		// Body
-		if (this.show_SOI) {
-			context_body.beginPath();
-			context_body.arc(this.screen_position.x, this.screen_position.y, this.SOI_radius, 0, 2*Math.PI);
-			context_body.fillStyle = 'rgba(205,92,92,0.5)';
-			context_body.fill();
-			context_body.closePath();
+		if (this.show.SOI) {
+			ctx_body.beginPath();
+			ctx_body.arc(this.screen_position.x, this.screen_position.y, this.SOI_radius, 0, 2*Math.PI);
+			ctx_body.fillStyle = 'rgba(205,92,92,0.5)';
+			ctx_body.fill();
+			ctx_body.closePath();
 		}
-		context_body.beginPath();
-		context_body.arc(this.screen_position.x, this.screen_position.y, this.radius, 0, 2*Math.PI);
-		context_body.fillStyle = this.color;
-		context_body.fill();
-		context_body.closePath();
+		ctx_body.beginPath();
+		ctx_body.arc(this.screen_position.x, this.screen_position.y, this.radius, 0, 2*Math.PI);
+		ctx_body.fillStyle = this.color;
+		ctx_body.fill();
+		ctx_body.closePath();
 		
 		// Label
-		if (this.legend) {
-			context_body.font = this.font;
-			context_body.fillStyle = this.color_font;
-			context_body.fillText(this.body.name, 
-								  this.screen_position.x - 3 * this.body.name.length,
-								  this.screen_position.y - this.radius*1.05 - 5); // Minimum 5 px + 5% offset
+		if (this.show.label) {
+//			ctx_body.font = this.font;
+			ctx_body.font = `${8 + 2/5*this.radius}px Arial`;
+			ctx_body.fillStyle = this.color_font;
+			ctx_body.textBaseline = "bottom";
+			ctx_body.textAlign = "center";
+			ctx_body.fillText(this.body.name, this.screen_position.x,
+								  this.screen_position.y - this.radius*1.15); // Minimum 5 px + 5% offset
 		}
 		
 		// Trajectory
-		if (this.show_orbit) {
-			context_path.beginPath();
-			context_path.rect(this.screen_position.x, this.screen_position.y, 1, 1);
-			context_path.fillStyle = this.color;
-			context_path.fill();
-			context_path.closePath();
+		if (this.show.orbit) {
+			ctx_path.beginPath();
+			ctx_path.rect(this.screen_position.x, this.screen_position.y, 1, 1);
+			ctx_path.fillStyle = this.color;
+			ctx_path.fill();
+			ctx_path.closePath();
 		}
 		
 	}
@@ -607,7 +612,7 @@ class Sketch {
 			scale: km/px or UA/px
 			scale_unit: 'km' or 'UA'
 			focus: Body class
-			plane: [vect3, vect3]
+			plane: {x:vect3, y:vect3}
 		*/
 		var position = this.body.abs_position;
 		
@@ -616,7 +621,8 @@ class Sketch {
 		
 		// Store position
 		if (this.store_orbit) {
-//			if (this.store.length > 120) {
+//			console.log(this.store.length);
+//			if (this.store.length > this.max_length) {
 //				this.store.shift();
 //			}
 			this.store.push(position);
@@ -628,12 +634,14 @@ class Sketch {
 		}
 		position = vect3.scale(1/scale, position);
 		
+		if (this.show.vector) {
+			position.draw(CONTEXT.BODY, PLANE, {color: this.color, length:position.module});
+		}
+		
 		// Plane projection and translation to the center
-		var screen_position = {x: vect3.dot(position, plane[0]) + center[0],
-							   y: - vect3.dot(position, plane[1]) + center[1]};
 		this.screen_position = {
-			x: screen_position.x,
-			y: screen_position.y
+			x: vect3.dot(position, plane.x) + center.x,
+			y: - vect3.dot(position, plane.y) + center.y
 		};
 	}
 	set_radius(scale, scale_unit) {
@@ -657,16 +665,19 @@ class Sketch {
 		this.SOI_radius = SOI_radius;
 	}
 	toggle_orbit() {
-		this.show_orbit = !this.show_orbit;
+		this.show.orbit = !this.show.orbit;
 		this.store_orbit = !this.store_orbit;
 		if (!this.store_orbit) {
 			this.reset_store();
 		}
 	}
+	toggle_SOI() {
+		this.show.SOI = !this.show.SOI;
+	}
 	reset_store() {
 		this.store = [];
 	}
-	draw_stored_position(context, center, scale, scale_unit, focus, plane) {
+	draw_stored_position(ctx, center, scale, scale_unit, focus, plane) {
 		for (var i = 0 ; i < this.store.length ; i++) {
 			var position = this.store[i];
 			var reference_body = this.body.reference;
@@ -681,13 +692,13 @@ class Sketch {
 			position = vect3.scale(1/scale, position);
 			
 			// Plane projection and translation to the center
-			var screen_position = {x: vect3.dot(position, plane[0]) + center[0],
-								   y: - vect3.dot(position, plane[1]) + center[1]};
-			context.beginPath();
-			context.rect(screen_position.x, screen_position.y, 1, 1);
-			context.fillStyle = this.color;
-			context.fill();
-			context.closePath();
+			var screen_position = {x: vect3.dot(position, plane.x) + center.x,
+								   y: - vect3.dot(position, plane.y) + center.y};
+			ctx.beginPath();
+			ctx.rect(screen_position.x, screen_position.y, 1, 1);
+			ctx.fillStyle = this.color;
+			ctx.fill();
+			ctx.closePath();
 		}
 	}
 	

@@ -2,20 +2,22 @@
 var CANVAS = {
 	BACKGROUND: document.getElementById('background'),
 	TRAJECTORY: document.getElementById('orbit'),
-	BODY: document.getElementById('animation')
+	BODY: document.getElementById('animation'),
+	CONTROL: document.getElementById('control')
 };
 
 // CONTEXT
 var CONTEXT = {
 	BACKGROUND: CANVAS.BACKGROUND.getContext('2d'),
 	TRAJECTORY: CANVAS.TRAJECTORY.getContext('2d'),
-	BODY: CANVAS.BODY.getContext('2d')
+	BODY: CANVAS.BODY.getContext('2d'),
+	CONTROL: CANVAS.CONTROL.getContext('2d')
 };
 
 // SCREEN SIZE & HUD
 var WIDTH = document.getElementById('body').offsetWidth;
 var HEIGHT = document.getElementById('body').offsetHeight;
-var CENTER = [Math.floor(WIDTH/2), Math.floor(HEIGHT/2)];
+var CENTER = {x: Math.floor(WIDTH/2), y: Math.floor(HEIGHT/2)};
 
 // PLANE
 var PLANE = {
@@ -139,7 +141,7 @@ var FOCUS = {
 };
 
 // PAUSE
-var PAUSE = false;
+var PAUSE = true;
 
 // LIST OF BODIES (STARTING EMPTY)
 var LIST_OBJ = null;
@@ -148,10 +150,19 @@ function start() {
 	/*
 		Init all the objects with the data stored then call the function animation()
 		ie declare all bodies then do the Kepler conversion thing to get their orbits
+		
+		Draw all HUD elements
 	*/
 	list_body = init()
 	LIST_OBJ = list_body;
 	FOCUS.body = LIST_OBJ[FOCUS.num];
+	
+	// Draw elements before running
+	SCALE.draw(CONTEXT.CONTROL);
+	PLANE.draw(CONTEXT.CONTROL);
+	TIME.draw_date(CONTEXT.CONTROL);
+	draw_body();
+	
 	requestAnimationFrame(animation);
 	
 	function init() {
@@ -203,9 +214,17 @@ function start() {
 }
 	
 function animation(time) {
+	TIME.tick();
 	if (PAUSE) {
 		return requestAnimationFrame(animation);
 	}
+	
+	run();
+	draw_body();
+	requestAnimationFrame(animation);
+}
+
+function draw_body() {
 	CONTEXT.BODY.clearRect(0,0,WIDTH,HEIGHT);
 	
 	for (var i = 0 ; i < LIST_OBJ.length ; i++) {
@@ -216,15 +235,13 @@ function animation(time) {
 		body.sketch.set_radius(SCALE.value, SCALE.unit);
 		body.sketch.set_position(CENTER, SCALE.value, SCALE.unit, FOCUS.body, PLANE);
 		body.sketch.draw(CONTEXT.BODY, CONTEXT.TRAJECTORY);
-		
-		if (!TIME.running) {
-			requestAnimationFrame(animation);
-		}
-		body.kepler_motion(TIME.dT, LIST_OBJ[9]);
-//		body.move(LIST_OBJ, TIME.dT);
 	}
-	TIME.tick();
-	requestAnimationFrame(animation);
 }
 
-start();
+function run() {
+	for (var i = 0 ; i < LIST_OBJ.length ; i++) {
+		LIST_OBJ[i].kepler_motion(TIME.dT);
+	}
+	TIME.set_date();
+	TIME.draw_date(CONTEXT.CONTROL);
+}
