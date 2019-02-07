@@ -18,7 +18,16 @@ var HEIGHT = document.getElementById('body').offsetHeight;
 var CENTER = [Math.floor(WIDTH/2), Math.floor(HEIGHT/2)];
 
 // PLANE
-var PLANE = [I, J];
+var PLANE = {
+	x: I, 
+	y: J,
+	draw: function(ctx) {
+		ctx.clearRect(0,HEIGHT-230,230,230);
+		I.draw(ctx, this, {type: 'vec', text: 'I', center: {x: 100, y: HEIGHT-100}});
+		J.draw(ctx, this, {type: 'vec', text: 'J', center: {x: 100, y: HEIGHT-100}});
+		K.draw(ctx, this, {type: 'vec', text: 'K', center: {x: 100, y: HEIGHT-100}});
+	}
+};
 
 // SCALE
 var SCALE = {
