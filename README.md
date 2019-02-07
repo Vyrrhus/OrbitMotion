@@ -33,18 +33,26 @@ With the n-body model, there's no SOI anymore and trajectories are not conics.
 Position vector is computed for each body using a Verlet's Integration. Velocity vector is then estimated although it's not as accurate as position.
 Such a simulation is very sensitive to the steptime size and has to be run carrefuly to avoid mistakes.
 
+==> DEPRECATED ?
+Not implemented yet as accuracy is not good enough. 
+There's no point to use the model to compute planet's positions as those are well known and described by JPL's HORIZONS.
+Might be useful for satellites if and only if accuracy is good enough.
+
 ## CONTROLS
 ### Rotation
 An inertial referential is set at the original barycenter of the system.
-The model can be rotated around the X-axis using `Z` and `S` inputs.
+The model can be rotated:
+- X-axis using `Z` and `S`
+- Y-axis using `Q` and `D`
+- Z-axis using `A` and `E`
 Quaternions are used to rotate the projection's plane (X,Y) on which the position vectors are projected.
 
 ### Show orbit
-Celestial bodies are drawn with a circle. Using `A`, their trajectories are shawn with a dot at each previous positions.
+Celestial bodies are drawn with a circle. Using `o`, their trajectories are shawn with a dot at each previous positions.
 Take care of the amount of points drawn when you rotate or zoom as all these points will have to be translated and thus cause lag issues.
 
 ### Show SOI
-Pressing `S` shows a red circle around every body. This circle represents their respective SOI (apart from the most massive body).
+Pressing `p` shows a red circle around every body. This circle represents their respective SOI (apart from the most massive body).
 If the SOI is not visible, it's probably because it is too small with the current scale.
 
 ### Zoom
@@ -61,16 +69,20 @@ Although there's no problem of accuracy with Keplerian model for most cases, it 
 ### Pause
 Pressing `SPACEBAR` pauses the simulation.
 
+### FPS
+`$` to show FPS
+
 
 ## WIP
-- complete the HUD with buttons, information toolbox for each bodies, time system
-- add a tool to add new bodies within the simulation (ie satellites)
+- add mobile devices
+
+- improve HUD : buttons, show velocity vectors, show planet data, etc.
+- tool to add new bodies within the simulation at given time.
+- add presets scenarios to choose (different sets of elements & time)
+
+- reduce steptime when a body is about to cross a SOI boundary
 - add a tool to solve Lambert's problem and compute trajectories
 - add maneuvers to change orbits
-- add presets models
-- rotation around every axis and showing those axis
-- reduce steptime when a body is about to cross a SOI boundary
-- add "ghost" trajectories based on n-body problem
 - add perturbations models to Keplerian orbits
 
 ## ISSUES
