@@ -45,6 +45,20 @@ Math.square = function(value) {
 Math.cube = function(value) {
 	return Math.pow(value, 3);
 };
+Number.prototype.pad = function() {
+	return ('0' + this).slice(-2);
+}
+Date.prototype.strDate = function() {
+	let year = this.getFullYear().toString();
+	if (this.getFullYear() < 0) {year += " BC"}
+	return year + "-" + (1+ this.getMonth()).pad() + "-" + this.getDate().pad()
+}
+Date.prototype.strTime = function() {
+	return this.getHours().pad() + ":" + this.getMinutes().pad() + ":" + this.getSeconds().pad()
+}
+Date.prototype.str = function() {
+	return this.strDate() + " " + this.strTime()
+}
 
 // Vector class
 class vect3 {
@@ -87,7 +101,7 @@ class vect3 {
 						 u.x * M.z.x + u.y * M.z.y + u.z * M.z.z)
 	}
 	static distance(u,v) {
-		return Math.sqrt(vect3.square_distance(u,v))
+		return Math.hypot(u.x-v.x, u.y-v.y, u.z-v.z)
 	}
 	static square_distance(u,v) {
 		return Math.square(u.x - v.x) + Math.square(u.y - v.y) + Math.square(u.z - v.z)
