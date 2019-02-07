@@ -1,224 +1,182 @@
-document.addEventListener('keypress', function(event) {
-	if (event.key === '+' || event.key === '-') {
-		if (event.key === '+') {
-			TIME.dT*=1.25;
-		}
-		else {
-			TIME.dT*=0.8;
-		}
-		if (Math.abs(TIME.dT) < 1) {TIME.dT = 1 * Math.sign(TIME.dT);}
-		if (TIME.dT > 365.25*86400) {TIME.dT = 365.25*86400;}
-	}
-	if (event.key === '1') {FOCUS.change(SUN);}
-	if (event.key === '2') {FOCUS.change(MERCURY);}
-	if (event.key === '3') {FOCUS.change(VENUS);}
-	if (event.key === '4') {FOCUS.change(EARTH);}
-	if (event.key === '5') {FOCUS.change(MARS);}
-	if (event.key === '6') {FOCUS.change(JUPITER);}
-	if (event.key === '7') {FOCUS.change(SATURN);}
-	if (event.key === '8') {FOCUS.change(URANUS);}
-	if (event.key === '9') {FOCUS.change(NEPTUNE);}
-	if (event.key === 'a') {
-		BUTTON.draw_ORBIT.switch();
-	}
-	if (event.keyCode === 32 || event.key === 'q') {
-		BUTTON.draw_TIMELINE.play_pause.switch();
-	}
-	if (event.keyCode === 47) {TIME.dT *= -1;}
-	if (event.key === '0') {
-		RUNNING = false;
-		TIME.dT = - TIME.value;
-		CONTEXT.ORBIT.clearRect(0,0,WIDTH,HEIGHT);
-		draw();
-		TIME.dT = 3600;
-		RUNNING = true;
-		draw();
-	}
-});
-
-document.addEventListener('wheel', function(event) {
-	ZOOM.num += event.deltaY/100;
-	if (ZOOM.num < 0 || ZOOM.num > 92) {
-		ZOOM.num -= event.deltaY/100;
-	}
-	if (ZOOM.num < 55) {ZOOM.unit = 1;ZOOM.unit_name = ' km';}
-	else {ZOOM.unit = UA;ZOOM.unit_name = ' UA';}
-	
-	ZOOM.value = ZOOM.b(ZOOM.num) * Math.pow(10,ZOOM.a(ZOOM.num)) * ZOOM.unit;
-	PX.set();
-	PX.scale(20,30);
-	CONTEXT.ORBIT.clearRect(0,0,WIDTH,HEIGHT);
-});
-
-document.addEventListener('click', function(event) {
-	let mouseX = event.clientX;
-	let mouseY = event.clientY;
-	function button_frame(x0,y0,dx,dy) {
-		if (mouseX >= x0 && mouseX <= (x0+dx) && mouseY >= y0 && mouseY <= (y0+dy)) {return true;}
-		else {return false;}
-	}
-	
-	// Button draw orbit
-	if (button_frame(15,70,15,20)) {BUTTON.draw_ORBIT.switch();}
-	
-	// Button draw informations
-	if (button_frame(15,95,15,20)) {BUTTON.draw_INFO.switch();}
-	if (button_frame(35,115,15,20)) {
-		BUTTON.draw_INFO.characteristics = !BUTTON.draw_INFO.characteristics;
-		BUTTON.draw_INFO.draw();
-	}
-	if (button_frame(35,135,15,20)) {
-		BUTTON.draw_INFO.elements = !BUTTON.draw_INFO.elements;
-		BUTTON.draw_INFO.draw();
-	}
-	if (button_frame(35,155,15,20)) {
-		BUTTON.draw_INFO.vector = !BUTTON.draw_INFO.vector;
-		BUTTON.draw_INFO.draw();
-	}
-	
-	// Legend for each planet
-	check_coordinates(DATA);
-	function check_coordinates() {
-		DATA.forEach(function(element) {
-			if (Math.abs(mouseX - element.x) < element.px_radius && Math.abs(mouseY - element.y) < element.px_radius) {
-				element.legend = !element.legend;
-			}
-		});
-	}
-});
-
-document.addEventListener('mousedown', function(event) {
-	let mouseX = event.clientX;
-	let mouseY = event.clientY;
-	function button_frame(x0,y0,dx,dy) {
-		if (mouseX >= x0 && mouseX <= (x0+dx) && mouseY >= y0 && mouseY <= (y0+dy)) {return true;}
-		else {return false;}
-	}
-	
-	// Rewind
-	if (button_frame(BUTTON.draw_TIMELINE.rewind.X,BUTTON.draw_TIMELINE.rewind.Y,60,60)) {
-		BUTTON.draw_TIMELINE.rewind.state = true;
-		BUTTON.draw_TIMELINE.rewind.draw();
-	}
-	
-	// Play && Pause
-	if (button_frame(BUTTON.draw_TIMELINE.play_pause.X, BUTTON.draw_TIMELINE.play_pause.Y, 60, 60)) {
-			BUTTON.draw_TIMELINE.play_pause.state = true;
-			BUTTON.draw_TIMELINE.play_pause.draw();
-		}
-	
-	// Stop
-	if (button_frame(BUTTON.draw_TIMELINE.stop.X,BUTTON.draw_TIMELINE.stop.Y,60,60)) {
-		BUTTON.draw_TIMELINE.stop.state = true;
-		BUTTON.draw_TIMELINE.stop.draw();
-	}
-	
-	// Fast forward
-	if (button_frame(BUTTON.draw_TIMELINE.fast_forward.X,BUTTON.draw_TIMELINE.fast_forward.Y,60,60)) {
-		BUTTON.draw_TIMELINE.fast_forward.state = true;
-		BUTTON.draw_TIMELINE.fast_forward.draw();
-	}
-	
-});
-
-document.addEventListener('mouseup', function(event) {
-	let mouseX = event.clientX;
-	let mouseY = event.clientY;
-	function button_frame(x0,y0,dx,dy) {
-		if (mouseX >= x0 && mouseX <= (x0+dx) && mouseY >= y0 && mouseY <= (y0+dy)) {return true;}
-		else {return false;}
-	}
-	
-	// Rewind
-	if (button_frame(BUTTON.draw_TIMELINE.rewind.X,BUTTON.draw_TIMELINE.rewind.Y,60,60)) {
-		BUTTON.draw_TIMELINE.rewind.state = false;
-		BUTTON.draw_TIMELINE.rewind.draw();
-		if (TIME.dT == 0) {TIME.dT_memory *= 0.8;}
-		else {TIME.dT *= 0.8;}
-		
-	}
-	
-	// Play && Pause
-	if (button_frame(BUTTON.draw_TIMELINE.play_pause.X, BUTTON.draw_TIMELINE.play_pause.Y, 60, 60)) {
-		BUTTON.draw_TIMELINE.play_pause.state = false;
-		BUTTON.draw_TIMELINE.play_pause.switch();
-		BUTTON.draw_TIMELINE.play_pause.draw();
-		
-	}
-	
-	// Stop
-	if (button_frame(BUTTON.draw_TIMELINE.stop.X,BUTTON.draw_TIMELINE.stop.Y,60,60)) {
-		BUTTON.draw_TIMELINE.stop.state = false;
-		BUTTON.draw_TIMELINE.stop.draw();
-		RUNNING = false;
-		CONTEXT.ORBIT.clearRect(0,0,WIDTH,HEIGHT);
-		TIME.dT = - TIME.value;
-		draw();
-		RUNNING = true;
-		TIME.dT = 0;
-		draw();
-		if (BUTTON.draw_TIMELINE.play_pause.pause) {
-			BUTTON.draw_TIMELINE.play_pause.switch();
-			BUTTON.draw_TIMELINE.play_pause.draw();
-		}
-		TIME.dT_memory = 3600;
-	}
-	
-	// Fast forward
-	if (button_frame(BUTTON.draw_TIMELINE.fast_forward.X,BUTTON.draw_TIMELINE.fast_forward.Y,60,60)) {
-		BUTTON.draw_TIMELINE.fast_forward.state = false;
-		BUTTON.draw_TIMELINE.fast_forward.draw();
-		if (TIME.dT == 0) {TIME.dT_memory *= 1.25;}
-		else {TIME.dT *= 1.25;}
-	}
-});
-
-// Resize of canvas:
+// Resize canvas
 window.onload = function() {
+	/*
+		Onload, CANVAS are resized, resize event is set and HUD elements are drawn
+	*/
+	
 	resize();
 	window.addEventListener('resize', resize, false);
+	start();
+	
 	function resize() {
-		WIDTH  = document.getElementById('body').offsetWidth;
+		WIDTH = document.getElementById('body').offsetWidth;
 		HEIGHT = document.getElementById('body').offsetHeight;
-		CENTER = [Math.floor (WIDTH/2),
-				  Math.floor(HEIGHT/2)];
-		resizeCanvas(BACKGROUND,ORBIT,ANIMATION,TEXT,CONTROL);
-		function resizeCanvas() {
-			[].forEach.call(arguments, function(element) {
-				element.width  = WIDTH;
-				element.height = HEIGHT;
-			});
-		}
-		// Function for backgrounds redraw at each resize
-		set_BACKGROUND();
-		FOCUS.draw();
-		PX.scale(20,30);
-		BUTTON.draw_ORBIT.draw();
-		BUTTON.draw_INFO.draw();
-		BUTTON.draw_TIMELINE.size = 40 + WIDTH/100;
-		BUTTON.draw_TIMELINE.draw();
-	}
-}
-
-// Fill canvas with 'background.png'
-function set_BACKGROUND() {
-	var img_BACKGROUND = new Image();
-	img_BACKGROUND.onload = function() {
-		var Y = 0;
-		while (Y < HEIGHT) {
-			fill_width();
-			Y += img_BACKGROUND.height;
-		}
-		function  fill_width() {
-			var X = 0;
-			while (X < WIDTH) {
-				CONTEXT.BACKGROUND.drawImage(img_BACKGROUND, X, Y);
-				X += img_BACKGROUND.width;
+		CENTER = {x: Math.floor(WIDTH/2), y: Math.floor(HEIGHT/2)};
+		resizeCanvas(CANVAS);
+		set_background();
+		
+		function resizeCanvas(canvas) {
+			for (element in canvas) {
+				CANVAS[element].width = WIDTH;
+				CANVAS[element].height = HEIGHT;
 			}
 		}
-	};
-	img_BACKGROUND.onerror = function() {
-		console.log('failed to load !');
-	};
-	img_BACKGROUND.src = 'img/background.png';
-}
+		function set_background() {
+			var img = new Image();
+			img.onload = function() {
+				var Y = 0;
+				while (Y < HEIGHT) {
+					fill_width();
+					Y += img.height;
+				}
+				function fill_width() {
+					var X = 0;
+					while (X < WIDTH) {
+						CONTEXT.BACKGROUND.drawImage(img, X, Y);
+						X += img.width;
+					}
+				}
+			};
+			img.onerror = function() {
+				console.log('background loading failed !');
+			};
+			img.src = 'img/background.png';
+		}
+	}
+};
+
+// Zoom
+document.addEventListener('wheel', function(event) {
+	SCALE.value *= (1 + Math.sign(event.deltaY) * 5/100) ;
+	if (SCALE.value < 1) {SCALE.value =1}
+	CONTEXT.TRAJECTORY.clearRect(0,0,WIDTH,HEIGHT);
+	for (var i = 0 ; i < LIST_OBJ.length ; i++) {
+		LIST_OBJ[i].sketch.draw_stored_position(CONTEXT.TRAJECTORY, CENTER, SCALE.value, SCALE.unit, FOCUS.body, PLANE);	
+	}
+	
+	// Clear and redraw bodies
+		if (PAUSE) {
+			draw_body();
+		}
+	SCALE.draw(CONTEXT.CONTROL);
+});
+
+// Event
+document.addEventListener('keypress', function(event) {
+	
+	// Toggle orbit
+	if (event.key === 'o') {
+		CONTEXT.TRAJECTORY.clearRect(0,0,WIDTH,HEIGHT);
+		for (var i = 0 ; i < LIST_OBJ.length ; i++) {
+			LIST_OBJ[i].sketch.toggle_orbit();
+		}
+	}
+	
+	// Toggle SOI
+	if (event.key === 'p') {
+		for (var i = 0 ; i < LIST_OBJ.length ; i++) {
+			LIST_OBJ[i].sketch.toggle_SOI();
+		}
+		draw_body();
+	}
+	
+	// Dev mode
+	if (event.key === '$') {
+		TIME.toggle_devMode();
+	}
+	
+	// Time 
+	/*
+		Adapt time so that it is smoother on date change (ie use multiple of 60 & 24)
+	*/
+	if (event.key === '+') {
+		TIME.dT *= 1.05;
+	}
+	if (event.key === '-') {
+		TIME.dT *= 0.95;
+	}
+	
+	// Change focus
+	if (event.key === '(' || event.key === ')') {
+		var sign = 1;
+		if (event.key === '(') {
+			sign *= -1;
+		}
+		FOCUS.num += sign;
+		if (FOCUS.num < 0) {
+			FOCUS.num = LIST_OBJ.length-1;
+		}
+		if (FOCUS.num > LIST_OBJ.length-1) {
+			FOCUS.num = 0;
+		}
+		FOCUS.body = LIST_OBJ[FOCUS.num];
+		CONTEXT.TRAJECTORY.clearRect(0,0,WIDTH,HEIGHT);
+		for (var i = 0 ; i < LIST_OBJ.length ; i++) {
+			LIST_OBJ[i].sketch.reset_store();
+			LIST_OBJ[i].sketch.draw_stored_position(CONTEXT.TRAJECTORY, CENTER, SCALE.value, SCALE.unit, FOCUS.body, PLANE);	
+		}
+		console.log(FOCUS.body.name)
+	}
+	
+	// Camera motion
+	if (event.key === 'z' || 
+		event.key === 's' ||
+	    event.key === 'q' ||
+	    event.key === 'd' ||
+	    event.key === 'a' ||
+	    event.key === 'e') {
+
+		var rotation = 1; // [°]
+		
+		// Rotation
+		switch (event.key) {
+			case 'z':
+				PLANE.y = quat.rotate(PLANE.y, rotation, PLANE.x);
+				break;
+			case 's':
+				rotation *= -1;
+				PLANE.y = quat.rotate(PLANE.y, rotation, PLANE.x);
+				break;
+			case 'q':
+				PLANE.x = quat.rotate(PLANE.x, rotation, PLANE.y);
+				break;
+			case 'd':
+				rotation *= -1;
+				PLANE.x = quat.rotate(PLANE.x, rotation, PLANE.y);
+				break;
+			case 'a':
+				var z = vect3.cross(PLANE.x, PLANE.y);
+				PLANE.x = quat.rotate(PLANE.x, rotation, z);
+				PLANE.y = quat.rotate(PLANE.y, rotation, z);
+				break;
+			case 'e':
+				rotation *= -1;
+				var z = vect3.cross(PLANE.x, PLANE.y);
+				PLANE.x = quat.rotate(PLANE.x, rotation, z);
+				PLANE.y = quat.rotate(PLANE.y, rotation, z);
+				break;
+			default:
+				return
+		}
+		
+		// Clear and redraw orbits
+		CONTEXT.TRAJECTORY.clearRect(0,0,WIDTH,HEIGHT);
+		for (var i = 0 ; i < LIST_OBJ.length ; i++) {
+			LIST_OBJ[i].sketch.draw_stored_position(CONTEXT.TRAJECTORY, CENTER, SCALE.value, SCALE.unit, FOCUS.body, PLANE);
+		}
+		
+		// Clear and redraw bodies
+		if (PAUSE) {
+			draw_body();
+		}
+		
+		// Redraw
+		PLANE.draw(CONTEXT.CONTROL);
+	}
+});
+
+document.addEventListener('keyup', function(event) {
+	if (event.keyCode === 32) {
+		PAUSE = !PAUSE;
+	}
+})
