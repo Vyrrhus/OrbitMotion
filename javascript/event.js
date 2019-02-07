@@ -1,12 +1,17 @@
 // Resize canvas
 window.onload = function() {
+	/*
+		Onload, CANVAS are resized, resize event is set and HUD elements are drawn
+	*/
+	
 	resize();
 	window.addEventListener('resize', resize, false);
+	start();
 	
 	function resize() {
 		WIDTH = document.getElementById('body').offsetWidth;
 		HEIGHT = document.getElementById('body').offsetHeight;
-		CENTER = [Math.floor(WIDTH/2), Math.floor(HEIGHT/2)];
+		CENTER = {x: Math.floor(WIDTH/2), y: Math.floor(HEIGHT/2)};
 		resizeCanvas(CANVAS);
 		set_background();
 		
@@ -58,7 +63,6 @@ document.addEventListener('wheel', function(event) {
 
 // Event
 document.addEventListener('keypress', function(event) {
-	if (event.key === 'a') {
 	
 	// Toggle orbit
 	if (event.key === 'o') {
@@ -114,12 +118,6 @@ document.addEventListener('keypress', function(event) {
 		console.log(FOCUS.body.name)
 	}
 	
-	if (event.key === 'z' || event.key === 's') {
-		var angle = 0.3;
-		if (event.key === 's') {angle *= -1}
-		var K = quat.rotate(PLANE[1],angle,I);
-		PLANE = [PLANE[0], K];
-//		console.log(tool.rad_to_deg(Math.acos(vect3.dot(K,J))));
 	// Camera motion
 	if (event.key === 'z' || 
 		event.key === 's' ||
