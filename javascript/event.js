@@ -91,6 +91,48 @@ document.addEventListener('keypress', function(event) {
 		var K = quat.rotate(PLANE[1],angle,I);
 		PLANE = [PLANE[0], K];
 //		console.log(tool.rad_to_deg(Math.acos(vect3.dot(K,J))));
+	// Camera motion
+	if (event.key === 'z' || 
+		event.key === 's' ||
+	    event.key === 'q' ||
+	    event.key === 'd' ||
+	    event.key === 'a' ||
+	    event.key === 'e') {
+
+		var rotation = 1; // [°]
+		
+		// Rotation
+		switch (event.key) {
+			case 'z':
+				PLANE.y = quat.rotate(PLANE.y, rotation, PLANE.x);
+				break;
+			case 's':
+				rotation *= -1;
+				PLANE.y = quat.rotate(PLANE.y, rotation, PLANE.x);
+				break;
+			case 'q':
+				PLANE.x = quat.rotate(PLANE.x, rotation, PLANE.y);
+				break;
+			case 'd':
+				rotation *= -1;
+				PLANE.x = quat.rotate(PLANE.x, rotation, PLANE.y);
+				break;
+			case 'a':
+				var z = vect3.cross(PLANE.x, PLANE.y);
+				PLANE.x = quat.rotate(PLANE.x, rotation, z);
+				PLANE.y = quat.rotate(PLANE.y, rotation, z);
+				break;
+			case 'e':
+				rotation *= -1;
+				var z = vect3.cross(PLANE.x, PLANE.y);
+				PLANE.x = quat.rotate(PLANE.x, rotation, z);
+				PLANE.y = quat.rotate(PLANE.y, rotation, z);
+				break;
+			default:
+				return
+		}
+		
+		// Clear and redraw orbits
 		CONTEXT.TRAJECTORY.clearRect(0,0,WIDTH,HEIGHT);
 		for (var i = 0 ; i < LIST_OBJ.length ; i++) {
 			LIST_OBJ[i].sketch.draw_stored_position(CONTEXT.TRAJECTORY, CENTER, SCALE.value, SCALE.unit, FOCUS.body, PLANE);
