@@ -67,12 +67,96 @@ class vect3 {
 		this.x = x;
 		this.y = y;
 		this.z = z;
+		
+		// Properties
+		this.length = 80;	// px
+		this.height = 7;	// px
+		this.width 	= 7; 	// px
 	}
 	
 	// Getters
 	get module() {
 		return Math.hypot(this.x, this.y, this.z)
 	}
+	get unit() {
+		if (this.module === 0) {
+			return this
+		} else {
+			return vect3.scale(1/this.module, this);
+		}
+	}
+	
+	// Methods
+	project(plane) {
+		var x = vect3.dot(this.unit, plane.x);
+		var y = vect3.dot(this.unit, plane.y);
+		return {x: vect3.dot(this.unit, plane.x),
+			    y: vect3.dot(this.unit, plane.y)}
+	}
+	draw(ctx, plane, options) {
+		// Key arguments
+		if (options === undefined) {
+			options = {};
+		}
+		if (options.center === undefined) {
+			options.center = CENTER;
+		}
+		if (options.origine === undefined) {
+			options.origine = [new vect3(0,0,0)];
+		} else if (options.origine.constructor.name === "vect3") {
+			options.origine = [options.origine];
+		}
+		if (options.color === undefined) {
+			options.color = "#FFF";
+		}
+		if (options.length !== undefined) {
+			this.length = options.length
+		}
+		if (options.type === undefined) {
+			options.type = 'line';
+		}
+		
+		// Screen origine for the vector
+		var screen_origine = {x: options.center.x, y: options.center.y};
+		
+		for (let i = 0 ; i < options.origine.length ; i++) {
+			let unit = options.origine[i].project(plane);
+			let length = options.origine[i].length;
+			screen_origine.x += unit.x * length;
+			screen_origine.y += unit.y * length;
+		}
+		
+		// Unit vector
+		var screen_vect = this.project(plane);
+		screen_vect.y *= -1;
+		
+		// Drawing
+		ctx.beginPath();
+		ctx.moveTo(screen_origine.x, screen_origine.y);
+		ctx.lineTo(screen_origine.x + screen_vect.x * this.length, 
+				   screen_origine.y + screen_vect.y * this.length);4
+		
+		if (options.type == 'vec') {
+			ctx.moveTo(screen_origine.x + screen_vect.x * (this.length - this.height) - this.width * screen_vect.y,
+					   screen_origine.y + screen_vect.y * (this.length - this.height) + this.width * screen_vect.x);
+			ctx.lineTo(screen_origine.x + screen_vect.x * this.length, 
+					   screen_origine.y + screen_vect.y * this.length);
+			ctx.moveTo(screen_origine.x + screen_vect.x * (this.length - this.height) + this.width * screen_vect.y,
+					   screen_origine.y + screen_vect.y * (this.length - this.height) - this.width * screen_vect.x);
+			ctx.lineTo(screen_origine.x + screen_vect.x * this.length, 
+					   screen_origine.y + screen_vect.y * this.length);
+			}
+		ctx.strokeStyle = options.color;
+		ctx.stroke();
+		
+		// Text
+		if (options.text !== undefined) {
+			ctx.font = "15px Arial";
+			ctx.fillStyle = options.color;
+			ctx.fillText(options.text, 
+					 	screen_origine.x + screen_vect.x * (this.length + 15),
+					 	screen_origine.y + screen_vect.y * (this.length + 15))
+		}
 	}
 	
 	// Static methods
