@@ -59,11 +59,32 @@ document.addEventListener('wheel', function(event) {
 // Event
 document.addEventListener('keypress', function(event) {
 	if (event.key === 'a') {
+	
+	// Toggle orbit
+	if (event.key === 'o') {
 		CONTEXT.TRAJECTORY.clearRect(0,0,WIDTH,HEIGHT);
 		for (var i = 0 ; i < LIST_OBJ.length ; i++) {
 			LIST_OBJ[i].sketch.toggle_orbit();
 		}
 	}
+	
+	// Toggle SOI
+	if (event.key === 'p') {
+		for (var i = 0 ; i < LIST_OBJ.length ; i++) {
+			LIST_OBJ[i].sketch.toggle_SOI();
+		}
+		draw_body();
+	}
+	
+	// Dev mode
+	if (event.key === '$') {
+		TIME.toggle_devMode();
+	}
+	
+	// Time 
+	/*
+		Adapt time so that it is smoother on date change (ie use multiple of 60 & 24)
+	*/
 	if (event.key === '+') {
 		TIME.dT *= 1.05;
 	}
