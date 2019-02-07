@@ -69,9 +69,10 @@ class vect3 {
 		this.z = z;
 	}
 	
-	// Properties
+	// Getters
 	get module() {
-		return Math.sqrt(Math.square(this.x) + Math.square(this.y) + Math.square(this.z))
+		return Math.hypot(this.x, this.y, this.z)
+	}
 	}
 	
 	// Static methods
