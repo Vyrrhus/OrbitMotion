@@ -48,6 +48,12 @@ document.addEventListener('wheel', function(event) {
 	for (var i = 0 ; i < LIST_OBJ.length ; i++) {
 		LIST_OBJ[i].sketch.draw_stored_position(CONTEXT.TRAJECTORY, CENTER, SCALE.value, SCALE.unit, FOCUS.body, PLANE);	
 	}
+	
+	// Clear and redraw bodies
+		if (PAUSE) {
+			draw_body();
+		}
+	SCALE.draw(CONTEXT.CONTROL);
 });
 
 // Event
@@ -64,6 +70,8 @@ document.addEventListener('keypress', function(event) {
 	if (event.key === '-') {
 		TIME.dT *= 0.95;
 	}
+	
+	// Change focus
 	if (event.key === '(' || event.key === ')') {
 		var sign = 1;
 		if (event.key === '(') {
@@ -137,6 +145,14 @@ document.addEventListener('keypress', function(event) {
 		for (var i = 0 ; i < LIST_OBJ.length ; i++) {
 			LIST_OBJ[i].sketch.draw_stored_position(CONTEXT.TRAJECTORY, CENTER, SCALE.value, SCALE.unit, FOCUS.body, PLANE);
 		}
+		
+		// Clear and redraw bodies
+		if (PAUSE) {
+			draw_body();
+		}
+		
+		// Redraw
+		PLANE.draw(CONTEXT.CONTROL);
 	}
 });
 
