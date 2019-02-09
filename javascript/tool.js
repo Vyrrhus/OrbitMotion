@@ -153,6 +153,8 @@ class vect3 {
 		if (options.text !== undefined) {
 			ctx.font = "15px Arial";
 			ctx.fillStyle = options.color;
+			ctx.textAlign = "center";
+			ctx.textBaseline = "middle";
 			ctx.fillText(options.text, 
 					 	screen_origine.x + screen_vect.x * (this.length + 15),
 					 	screen_origine.y + screen_vect.y * (this.length + 15))
