@@ -115,7 +115,10 @@ document.addEventListener('keypress', function(event) {
 			LIST_OBJ[i].sketch.reset_store();
 			LIST_OBJ[i].sketch.draw_stored_position(CONTEXT.TRAJECTORY, CENTER, SCALE.value, SCALE.unit, FOCUS.body, PLANE);	
 		}
-		console.log(FOCUS.body.name)
+		console.log(`FOCUS set on : ${FOCUS.body.name}`)
+		if (PAUSE) {
+			draw_body();
+		}
 	}
 	
 	// Camera motion
