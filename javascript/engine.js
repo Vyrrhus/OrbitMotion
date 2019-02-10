@@ -497,6 +497,7 @@ class Orbit {
 	}
 }
 
+// Useless class
 class N_body {
 	// Constructor
 	constructor(self, dT) {
@@ -538,6 +539,7 @@ class N_body {
 	}
 }
 
+// Sketch class
 class Sketch {
 	// Constructor
 	constructor(self) {
@@ -717,4 +719,99 @@ class Sketch {
 		Put events such as onclick to toggle legend
 	*/
 	
+}
+
+// Scenario class
+/*
+	Elements qui changent pour chaque scénario :
+	- valeur UA	=> preset
+	- valeur G	=> preset
+	- liste des BODIES initialisés (ie avec position de départ)
+	- FOCUS.body
+	- SCALE.value	=> preset
+	- TIME.value	=> preset
+	- TIME.date (à noter que ce serait cool de récup automatiquement les vecteurs d'état de chaque corps pour toutes les époques)
+	- PLANE.x && PLANE.y	=> preset
+	
+	Concernant les pb d'époque on va pour le moment considérer que tout est cohérent ; à l'avenir faudra distinguer "simulation epoch" et les différentes epoch, et initialiser la position des corps à la simulation epoch.
+	Concernant les valeurs preset pour l'instant on les fixe, à l'avenir on pourrait s'en passer en automatisant leur génération
+	Concernant l'ajout de bodies faudra pouvoir utiliser des éléments orbitaux directement plutôt que vecteur d'état (tous les angles par défaut à 0° si non renseignés)
+*/
+class Scenario {
+	// Constructor
+	constructor(name, options) {
+		this.name = name;
+		this.list_bodies = [];
+		
+		// Options
+		if (options === undefined) {
+			options = {};
+		}
+		if (options.UA === undefined) {
+			options.UA = 149597870.7;	// km
+		}
+		if (options.G === undefined) {
+			options.G = 6.67408e-20; 	// km3/kg/s2
+		}
+		
+		this.UA = options.UA;
+		UA = this.UA;
+		this.G 	= options.G;
+		G = this.G;
+		this.focus = options.focus;
+		this.scale = options.scale;
+		this.dT = options.dT;
+		this.epoch = options.epoch;
+		this.plane = options.plane; // On pourrait faire des trucs sympas avec plane (ecliptique, perifocal, etc.)
+	}
+	
+	// Methods
+	add_body(body, options) {
+		body.init_state(options.x, options.y, options.z, options.vx, options.vy, options.vz, options.reference);
+		this.list_bodies.push(body);
+	}
+	set_kepler() {
+		var list_bodies = this.list_bodies;
+		
+		// Sort by mass
+		list_bodies.sort(function(a,b) {
+			return (b.mass - a.mass)
+		});
+		console.log(`${this.name} - central body : ${list_bodies[0].name}`);
+		
+		// Iterate
+		for (var i = 1 ; i < list_bodies.length ; i++) {
+			console.log(`${this.name} - add ${list_bodies[i].name}`);
+			var reference = this.list_bodies[0];
+			for (var j = i - 1; j > 0 ; j--) {
+				var distance = Body.get_distance(list_bodies[i], list_bodies[j]);
+				var SOI = list_bodies[j].SOI;
+				if (distance < SOI) {
+					// Reference found
+					reference = list_bodies[j];
+					j = 0;
+				}
+			}
+			
+			// Add child to reference
+			reference.child.push(list_bodies[i]);
+			
+			// Set state vectors
+			list_bodies[i].reference = reference;
+			while (reference !== 'inertial') {
+				list_bodies[i].position = vect3.sum(1, list_bodies[i].position, -1, reference.position);
+				list_bodies[i].velocity = vect3.sum(1, list_bodies[i].velocity, -1, reference.velocity);
+				reference = reference.reference;
+			}
+			list_bodies[i].get_orbit(list_bodies[i].reference);
+			console.log(`${list_bodies[i].orbit.shape} - ${list_bodies[i].orbit.special_case}`);
+		}
+	}
+	init() {
+		this.set_kepler();
+		if (!this.list_bodies.includes(this.focus)) {
+			this.focus = this.list_bodies[0];
+		}
+		
+	}
 }
