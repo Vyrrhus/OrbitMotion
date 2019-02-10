@@ -68,6 +68,14 @@ class Body {
 		}
 		this.position = new vect3(x, y, z);
 		this.velocity = new vect3(vx, vy, vz);
+		
+		var ref = this.reference;
+		while (ref !== 'inertial') {
+			this.position = vect3.sum(1,this.position,1,this.reference.position);
+			this.velocity = vect3.sum(1,this.velocity,1,this.reference.velocity);
+			ref = reference.reference;
+		}
+		this.reference = ref;
 	}
 	get_rel_state(reference) {
 		var abs_state = this.abs_state;
@@ -156,10 +164,12 @@ class Body {
 		this.get_orbit(this.orbit.parent);
 		
 		// Get initial guess for anomaly
-		if (this.orbit.special_case === "circular equatorial" || this.orbit.special_case === 'circular inclined') {
-			var guess = this.latitude;
-		} else {
+		if (this.orbit.special_case !== 'circular equatorial' && this.orbit.special_case !== 'circular inclined') {
 			var guess = this.orbit.v_to_anomaly(this.orbit.v);
+		} else if (this.orbit.special_case === 'circular equatorial') {
+			var guess = this.orbit.l_true;
+		} else {
+			var guess = this.orbit.latitude;
 		}
 		
 		// Get anomaly
@@ -173,10 +183,12 @@ class Body {
 		var anomaly = this.orbit.mean_to_anomaly(mean_anomaly);
 		
 		// Get true anomaly
-		if (this.orbit.special_case === 'circular equatorial' || this.orbit.special_case === 'circular inclined') {
-			this.orbit.latitude = anomaly;
-		} else {
+		if (this.orbit.special_case !== 'circular equatorial' && this.orbit.special_case !== 'circular inclined') {
 			this.orbit.v = this.orbit.anomaly_to_v(anomaly);
+		} else if (this.orbit.special_case === 'circular equatorial') {
+			this.orbit.l_true = this.orbit.true_longitude = anomaly;
+		} else {
+			this.orbit.u = this.orbit.latitude = anomaly;
 		}
 		
 		// Get state vectors
@@ -263,6 +275,7 @@ class Body {
 	}
 }
 
+// Orbit class
 class Orbit {
 	// Constructor
 	constructor(central_body, inclination, node, eccentricity, semi_major_axis, argument, true_anomaly,
@@ -432,29 +445,26 @@ class Orbit {
 	}
 	get_state() {
 		// Initialization
-		var v = this.v;
-		var w = this.w;
-		var W = this.W;
 		if (this.special_case !== null) {
 			switch (this.special_case) {
 				case "circular equatorial":
-					w, W = 0;
-					v = this.l_true;
+					this.w = this.periapsis_argument = this.W = this.AN_longitude = 0;
+					this.v = this.true_anomaly = this.l_true;
 					break;
 				case "circular inclined":
-					w = 0;
-					v = this.u;
+					this.w = this.periapsis_argument = 0;
+					this.v = this.true_anomaly = this.u;
 					break;
 				case "elliptical equatorial":
-					W = 0;
-					w = this.w_true;
+					this.W = this.AN_longitude = 0;
+					this.w = this.periapsis_argument = this.w_true;
 					break;
 				default:
 					console.log(`Special case isn't properly defined: ${this.special_case}`);
 			}
 		}
-		let cos_v = Math.cos(v);
-		let sin_v = Math.sin(v);
+		let cos_v = Math.cos(this.v);
+		let sin_v = Math.sin(this.v);
 		let mu_p = this.parent.G / this.p;
 		
 		// Perifocal frame
@@ -468,10 +478,10 @@ class Orbit {
 		// DCM Matrix
 		let cos_i = Math.cos(this.i);
 		let sin_i = Math.sin(this.i);
-		let cos_W = Math.cos(W);
-		let sin_W = Math.sin(W);
-		let cos_w = Math.cos(w);
-		let sin_w = Math.sin(w);
+		let cos_W = Math.cos(this.W);
+		let sin_W = Math.sin(this.W);
+		let cos_w = Math.cos(this.w);
+		let sin_w = Math.sin(this.w);
 		let DCM = new vect3(new vect3(cos_W * cos_w - sin_W * sin_w * cos_i,
 									  - cos_W * sin_w - sin_W * cos_w * cos_i,
 									  sin_W * sin_i),
@@ -487,6 +497,7 @@ class Orbit {
 	}
 }
 
+// Useless class
 class N_body {
 	// Constructor
 	constructor(self, dT) {
@@ -528,6 +539,7 @@ class N_body {
 	}
 }
 
+// Sketch class
 class Sketch {
 	// Constructor
 	constructor(self) {
@@ -707,4 +719,99 @@ class Sketch {
 		Put events such as onclick to toggle legend
 	*/
 	
+}
+
+// Scenario class
+/*
+	Elements qui changent pour chaque scénario :
+	- valeur UA	=> preset
+	- valeur G	=> preset
+	- liste des BODIES initialisés (ie avec position de départ)
+	- FOCUS.body
+	- SCALE.value	=> preset
+	- TIME.value	=> preset
+	- TIME.date (à noter que ce serait cool de récup automatiquement les vecteurs d'état de chaque corps pour toutes les époques)
+	- PLANE.x && PLANE.y	=> preset
+	
+	Concernant les pb d'époque on va pour le moment considérer que tout est cohérent ; à l'avenir faudra distinguer "simulation epoch" et les différentes epoch, et initialiser la position des corps à la simulation epoch.
+	Concernant les valeurs preset pour l'instant on les fixe, à l'avenir on pourrait s'en passer en automatisant leur génération
+	Concernant l'ajout de bodies faudra pouvoir utiliser des éléments orbitaux directement plutôt que vecteur d'état (tous les angles par défaut à 0° si non renseignés)
+*/
+class Scenario {
+	// Constructor
+	constructor(name, options) {
+		this.name = name;
+		this.list_bodies = [];
+		
+		// Options
+		if (options === undefined) {
+			options = {};
+		}
+		if (options.UA === undefined) {
+			options.UA = 149597870.7;	// km
+		}
+		if (options.G === undefined) {
+			options.G = 6.67408e-20; 	// km3/kg/s2
+		}
+		
+		this.UA = options.UA;
+		UA = this.UA;
+		this.G 	= options.G;
+		G = this.G;
+		this.focus = options.focus;
+		this.scale = options.scale;
+		this.dT = options.dT;
+		this.epoch = options.epoch;
+		this.plane = options.plane; // On pourrait faire des trucs sympas avec plane (ecliptique, perifocal, etc.)
+	}
+	
+	// Methods
+	add_body(body, options) {
+		body.init_state(options.x, options.y, options.z, options.vx, options.vy, options.vz, options.reference);
+		this.list_bodies.push(body);
+	}
+	set_kepler() {
+		var list_bodies = this.list_bodies;
+		
+		// Sort by mass
+		list_bodies.sort(function(a,b) {
+			return (b.mass - a.mass)
+		});
+		console.log(`${this.name} - central body : ${list_bodies[0].name}`);
+		
+		// Iterate
+		for (var i = 1 ; i < list_bodies.length ; i++) {
+			console.log(`${this.name} - add ${list_bodies[i].name}`);
+			var reference = this.list_bodies[0];
+			for (var j = i - 1; j > 0 ; j--) {
+				var distance = Body.get_distance(list_bodies[i], list_bodies[j]);
+				var SOI = list_bodies[j].SOI;
+				if (distance < SOI) {
+					// Reference found
+					reference = list_bodies[j];
+					j = 0;
+				}
+			}
+			
+			// Add child to reference
+			reference.child.push(list_bodies[i]);
+			
+			// Set state vectors
+			list_bodies[i].reference = reference;
+			while (reference !== 'inertial') {
+				list_bodies[i].position = vect3.sum(1, list_bodies[i].position, -1, reference.position);
+				list_bodies[i].velocity = vect3.sum(1, list_bodies[i].velocity, -1, reference.velocity);
+				reference = reference.reference;
+			}
+			list_bodies[i].get_orbit(list_bodies[i].reference);
+			console.log(`${list_bodies[i].orbit.shape} - ${list_bodies[i].orbit.special_case}`);
+		}
+	}
+	init() {
+		this.set_kepler();
+		if (!this.list_bodies.includes(this.focus)) {
+			this.focus = this.list_bodies[0];
+		}
+		
+	}
 }

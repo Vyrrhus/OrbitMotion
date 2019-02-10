@@ -153,11 +153,42 @@ function start() {
 		
 		Draw all HUD elements
 	*/
+	// Load scenario
+	var SCENARIO 	= _SCENARIO;	//_SOLAR_SYSTEM;
+	SCENARIO.init();
+	LIST_OBJ 		= SCENARIO.list_bodies;
+	
+	// Focus
+	FOCUS.num 		= SCENARIO.list_bodies.indexOf(SCENARIO.focus);
+	FOCUS.body 		= SCENARIO.focus;
+	console.log(`FOCUS on ${FOCUS.body.name}`);
+	
+	// Scale
+	SCALE.value 	= SCENARIO.scale;
+	SCALE.draw(CONTEXT.CONTROL);
+	
+	// Time
+	TIME.date 		= SCENARIO.epoch;
+	TIME.dT			= SCENARIO.dT;
+	TIME.draw_date(CONTEXT.CONTROL);
+	
+	// Plane
+	PLANE.x			= SCENARIO.plane.x;
+	PLANE.y			= SCENARIO.plane.y;
+	PLANE.draw(CONTEXT.CONTROL);
+	
+	// Draw sketch
+	draw_body();
+	
+	// Run animation
+	requestAnimationFrame(animation);
+	
+	/*
 	list_body = init()
 	LIST_OBJ = list_body;
 	FOCUS.body = LIST_OBJ[FOCUS.num];
 	
-	// Draw elements before running
+	 Draw elements before running
 	SCALE.draw(CONTEXT.CONTROL);
 	PLANE.draw(CONTEXT.CONTROL);
 	TIME.draw_date(CONTEXT.CONTROL);
@@ -210,7 +241,7 @@ function start() {
 	
 		// Return list 
 		return list_body
-	}
+	}*/
 }
 	
 function animation(time) {

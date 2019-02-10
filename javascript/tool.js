@@ -153,6 +153,8 @@ class vect3 {
 		if (options.text !== undefined) {
 			ctx.font = "15px Arial";
 			ctx.fillStyle = options.color;
+			ctx.textAlign = "center";
+			ctx.textBaseline = "middle";
 			ctx.fillText(options.text, 
 					 	screen_origine.x + screen_vect.x * (this.length + 15),
 					 	screen_origine.y + screen_vect.y * (this.length + 15))
@@ -238,6 +240,9 @@ class quat {
 }
 
 // Inertial coordinate vectors
-var I = new vect3(1,0,0);
-var J = new vect3(0,1,0);
-var K = new vect3(0,0,1);
+const I = new vect3(1,0,0);
+const J = new vect3(0,1,0);
+const K = new vect3(0,0,1);
+
+const U = new vect3(0.9174992863750878, 0, 0.39773742532128487);
+const V = new vect3(-0.39773742532128487, 0, 0.9174992863750878);
