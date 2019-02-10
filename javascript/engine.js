@@ -68,6 +68,14 @@ class Body {
 		}
 		this.position = new vect3(x, y, z);
 		this.velocity = new vect3(vx, vy, vz);
+		
+		var ref = this.reference;
+		while (ref !== 'inertial') {
+			this.position = vect3.sum(1,this.position,1,this.reference.position);
+			this.velocity = vect3.sum(1,this.velocity,1,this.reference.velocity);
+			ref = reference.reference;
+		}
+		this.reference = ref;
 	}
 	get_rel_state(reference) {
 		var abs_state = this.abs_state;
@@ -156,10 +164,12 @@ class Body {
 		this.get_orbit(this.orbit.parent);
 		
 		// Get initial guess for anomaly
-		if (this.orbit.special_case === "circular equatorial" || this.orbit.special_case === 'circular inclined') {
-			var guess = this.latitude;
-		} else {
+		if (this.orbit.special_case !== 'circular equatorial' && this.orbit.special_case !== 'circular inclined') {
 			var guess = this.orbit.v_to_anomaly(this.orbit.v);
+		} else if (this.orbit.special_case === 'circular equatorial') {
+			var guess = this.orbit.l_true;
+		} else {
+			var guess = this.orbit.latitude;
 		}
 		
 		// Get anomaly
@@ -173,10 +183,12 @@ class Body {
 		var anomaly = this.orbit.mean_to_anomaly(mean_anomaly);
 		
 		// Get true anomaly
-		if (this.orbit.special_case === 'circular equatorial' || this.orbit.special_case === 'circular inclined') {
-			this.orbit.latitude = anomaly;
-		} else {
+		if (this.orbit.special_case !== 'circular equatorial' && this.orbit.special_case !== 'circular inclined') {
 			this.orbit.v = this.orbit.anomaly_to_v(anomaly);
+		} else if (this.orbit.special_case === 'circular equatorial') {
+			this.orbit.l_true = this.orbit.true_longitude = anomaly;
+		} else {
+			this.orbit.u = this.orbit.latitude = anomaly;
 		}
 		
 		// Get state vectors
@@ -263,6 +275,7 @@ class Body {
 	}
 }
 
+// Orbit class
 class Orbit {
 	// Constructor
 	constructor(central_body, inclination, node, eccentricity, semi_major_axis, argument, true_anomaly,
@@ -432,29 +445,26 @@ class Orbit {
 	}
 	get_state() {
 		// Initialization
-		var v = this.v;
-		var w = this.w;
-		var W = this.W;
 		if (this.special_case !== null) {
 			switch (this.special_case) {
 				case "circular equatorial":
-					w, W = 0;
-					v = this.l_true;
+					this.w = this.periapsis_argument = this.W = this.AN_longitude = 0;
+					this.v = this.true_anomaly = this.l_true;
 					break;
 				case "circular inclined":
-					w = 0;
-					v = this.u;
+					this.w = this.periapsis_argument = 0;
+					this.v = this.true_anomaly = this.u;
 					break;
 				case "elliptical equatorial":
-					W = 0;
-					w = this.w_true;
+					this.W = this.AN_longitude = 0;
+					this.w = this.periapsis_argument = this.w_true;
 					break;
 				default:
 					console.log(`Special case isn't properly defined: ${this.special_case}`);
 			}
 		}
-		let cos_v = Math.cos(v);
-		let sin_v = Math.sin(v);
+		let cos_v = Math.cos(this.v);
+		let sin_v = Math.sin(this.v);
 		let mu_p = this.parent.G / this.p;
 		
 		// Perifocal frame
@@ -468,10 +478,10 @@ class Orbit {
 		// DCM Matrix
 		let cos_i = Math.cos(this.i);
 		let sin_i = Math.sin(this.i);
-		let cos_W = Math.cos(W);
-		let sin_W = Math.sin(W);
-		let cos_w = Math.cos(w);
-		let sin_w = Math.sin(w);
+		let cos_W = Math.cos(this.W);
+		let sin_W = Math.sin(this.W);
+		let cos_w = Math.cos(this.w);
+		let sin_w = Math.sin(this.w);
 		let DCM = new vect3(new vect3(cos_W * cos_w - sin_W * sin_w * cos_i,
 									  - cos_W * sin_w - sin_W * cos_w * cos_i,
 									  sin_W * sin_i),
