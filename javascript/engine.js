@@ -13,9 +13,38 @@ class Body {
 		this.child = [];
 		
 		// State vectors (relative to the reference)
-		this.position = new vect3(0,0,0);
-		this.velocity = new vect3(0,0,0);
-		this.reference = 'inertial';		// either 'inertial' or another Body class instance.
+		this.state = {
+			position: new vect3(0,0,0),
+			velocity: new vect3(0,0,0),
+			reference: null,
+			get_absolute: function() {
+				//	Variables initialization
+				var ref = this.reference;
+				var abs_state = {position: this.position, velocity: this.velocity};
+				
+				// Iteration
+				while (ref !== null) {
+					abs_state.position = vect3.add(abs_state.position, ref.state.position);
+					abs_state.velocity = vect3.add(abs_state.velocity, ref.state.velocity);
+					ref = ref.state.reference;
+				}
+				return abs_state
+			},
+			get_relative: function(ref) {
+				var absolute_state = this.get_absolute();
+				var absolute_ref = ref.state.get_absolute();
+				var relative_state = {position: vect3.diff(absolute_state.position,
+														   absolute_ref.position),
+									  velocity: vect3.diff(absolute_state.velocity,
+														   absolute_ref.velocity)};
+				return relative_state
+			},
+			set_state: function(state, ref) {
+				this.position = state.position;
+				this.velocity = state.velocity;
+				this.reference = ref;
+			}
+		}
 		
 		// Keplerian orbit
 		this.orbit = null;
@@ -28,15 +57,6 @@ class Body {
 	}
 	
 	// Getter
-	get abs_position() {
-		var ref = this.reference;
-		var position = this.position;
-		while (ref !== 'inertial') {
-			position = vect3.sum(1,position,1,ref.position);
-			ref = ref.reference;
-		}
-		return position
-	}
 	get SOI() {
 		if (this.orbit === null) {
 			return undefined
@@ -44,47 +64,22 @@ class Body {
 			return this.orbit.a * Math.pow(this.mass/this.orbit.parent.mass, 2/5)
 		}	
 	}
-	get abs_state() {
-		var ref = this.reference;
-		var position = this.position;
-		var velocity = this.velocity;
-		while (ref !== 'inertial') {
-			position = vect3.sum(1,position,1,ref.position);
-			velocity = vect3.sum(1,velocity,1,ref.velocity);
-			ref = ref.reference;
-		}
-		return {position: position, velocity: velocity}
-	}
 	
 	// Methods
 	init_state(x, y, z, vx, vy, vz, reference) {
 		/*
 			Initialization of state & reference
 		*/
-		if (reference === undefined) {
-			this.reference = 'inertial';
-		} else {
-			this.reference = reference;
-		}
-		this.position = new vect3(x, y, z);
-		this.velocity = new vect3(vx, vy, vz);
+		this.state.position = new vect3(x, y, z);
+		this.state.velocity = new vect3(vx, vy, vz);
 		
-		var ref = this.reference;
-		while (ref !== 'inertial') {
-			this.position = vect3.sum(1,this.position,1,this.reference.position);
-			this.velocity = vect3.sum(1,this.velocity,1,this.reference.velocity);
-			ref = reference.reference;
+		if (reference !== undefined) {
+			this.state.reference = reference;
+			var abs_state = this.state.get_absolute();
+			this.state.position = abs_state.position;
+			this.state.velocity = abs_state.velocity;
+			this.state.reference = null;
 		}
-		this.reference = ref;
-	}
-	get_rel_state(reference) {
-		var abs_state = this.abs_state;
-		while (reference !== 'inertial') {
-			abs_state.position = vect3.sum(1,abs_state.position,-1,reference.position);
-			abs_state.velocity = vect3.sum(1,abs_state.velocity,-1,reference.velocity);
-			reference = reference.reference;
-		}
-		return abs_state
 	}
 	
 	get_orbit(central_body) {
@@ -96,8 +91,8 @@ class Body {
 		var central_G = central_body.G;
 		
 		// Initial state vectors
-		var r = this.position;
-		var v = this.velocity;
+		var r = this.state.position;
+		var v = this.state.velocity;
 		
 		// Angular momentum vector
 		var h = vect3.cross(r, v);
@@ -130,7 +125,7 @@ class Body {
 		if (n.y < 0) {
 			W = 2 * Math.PI - W;
 		}
-		var w = Math.acos(vect3.dot(n, e) / (n.module * e.module));		// Argument of the periapsis
+		var w = Math.acos(Math.round(vect3.dot(n, e) / (n.module * e.module) * 1e12)/1e12);		// Argument of the periapsis
 		if (e.z < 0) {
 			w = 2 * Math.PI - w;
 		}
@@ -144,7 +139,7 @@ class Body {
 		if (e.y < 0) {
 			w_true = 2 * Math.PI - w_true;
 		}
-		var u = Math.acos(vect3.dot(n, r) / (n.module * r.module));		// Argument of latitude (circular inclined)
+		var u = Math.acos(Math.round(vect3.dot(n, r) / (n.module * r.module) * 1e12)/1e12);		// Argument of latitude (circular inclined)
 		if (r.z < 0) {
 			u = 2 * Math.PI - u;
 		}
@@ -193,15 +188,14 @@ class Body {
 		
 		// Get state vectors
 		var state = this.orbit.get_state();
-		this.position = state.r;
-		this.velocity = state.v;
+		this.state.set_state(state, this.state.reference);
 		
 		// SOI Checks
 		// 1st check: out of parent SOI (if not around primary object)
 		if (this.orbit.parent.orbit !== null && Body.get_distance(this, this.orbit.parent) >= this.orbit.parent.SOI) {
 			console.log(`${this.name} leaves ${this.orbit.parent.name}'s orbit`);
 			var reference = this.orbit.parent.orbit.parent;
-			var rel_state = this.get_rel_state(reference);
+			var rel_state = this.state.get_relative(reference);
 			
 			this.reference = reference;
 			this.position = rel_state.position;
@@ -221,7 +215,7 @@ class Body {
 			}
 			if (Body.get_distance(this, child) <= child.SOI) {
 				console.log(`${this.name} leaves ${this.orbit.parent.name}'s orbit`);
-				var rel_state = this.get_rel_state(child);
+				var rel_state = this.state.get_relative(child);
 				
 				this.reference = child;
 				this.position = rel_state.position;
@@ -263,15 +257,20 @@ class Body {
 		}
 		this.position = this.n_body.verlet(list_body, dT);
 	}
+	copy(name) {
+		return new Body(name, this.color, this.mass, this.radius)
+	}
 	
 	// Static methods
 	static get_distance(A,B) {
-		return vect3.distance(A.abs_position, B.abs_position)
+		return vect3.distance(A.state.get_absolute().position, B.state.get_absolute().position)
 	}
 	static get_specific_force(attracted, attractor) {
-		var vect_dist = vect3.sum(-1,attracted.abs_position, 1, attractor.abs_position);
-		return vect3.scale(G * attractor.mass / vect3.square_distance(attracted.abs_position, attractor.abs_position),
-						   vect3.scale(1/vect_dist.module, vect_dist))
+		// Relative position
+		var relative_position = attractor.state.get_relative(attracted);
+		var scale = G * attractor.mass / relative_position.module_2;
+		
+		return vect3.scale(scale, relative_position.unit)
 	}
 }
 
@@ -493,7 +492,7 @@ class Orbit {
 									  cos_i));
 		let r_centered = vect3.product(DCM, pos);
 		let v_centered = vect3.product(DCM, vel);
-		return {r: r_centered, v: v_centered};
+		return {position: r_centered, velocity: v_centered};
 	}
 }
 
@@ -567,7 +566,7 @@ class Sketch {
 			y: 0
 		}
 		this.store = [];
-		this.max_length = 500;
+		this.max_length = 600;
 	}
 	
 	// Methods
@@ -626,10 +625,10 @@ class Sketch {
 			focus: Body class
 			plane: {x:vect3, y:vect3}
 		*/
-		var position = this.body.abs_position;
+		var position = this.body.state.get_absolute().position;
 		
 		// Set focus
-		position = vect3.sum(1,position, -1, focus.abs_position);
+		position = vect3.diff(position, focus.state.get_absolute().position);
 		
 		// Store position
 		if (this.store_orbit) {
@@ -695,7 +694,7 @@ class Sketch {
 			var reference_body = this.body.reference;
 			
 			// Set focus
-			position = vect3.sum(1, position, -1, focus.sketch.store[i]);
+			position = vect3.diff(position, focus.sketch.store[i]);
 			
 			// Scale in px
 			if (scale_unit === 'UA') {
@@ -767,7 +766,28 @@ class Scenario {
 	
 	// Methods
 	add_body(body, options) {
-		body.init_state(options.x, options.y, options.z, options.vx, options.vy, options.vz, options.reference);
+		if (options.body === undefined) {
+			// Vector elements
+			body.init_state(options.x, options.y, options.z, options.vx, options.vy, options.vz, options.reference);
+		} else {
+			// Kepler elements (KERBAL ONLY - WIP)
+			body.orbit = new Orbit(options.body, 
+								   tool.deg_to_rad(options.i), 
+								   tool.deg_to_rad(options.W), 
+								   options.e, 
+								   options.a, 
+								   tool.deg_to_rad(options.w), 
+								   options.v, 
+								   {h: Math.sqrt(options.a * options.body.G * (1-options.e*options.e)), 
+									w_true:tool.deg_to_rad(options.W + options.w), 
+									u:tool.deg_to_rad(options.w + options.v), l_true:tool.deg_to_rad(options.w + options.v + options.W)});
+			body.orbit.v = body.orbit.true_anomaly = body.orbit.mean_to_anomaly(body.orbit.v);
+			
+			// Set state vectors
+			var state = body.orbit.get_state();
+			body.state.set_state(state, options.body);
+		}
+		
 		this.list_bodies.push(body);
 	}
 	set_kepler() {
@@ -796,14 +816,10 @@ class Scenario {
 			// Add child to reference
 			reference.child.push(list_bodies[i]);
 			
-			// Set state vectors
-			list_bodies[i].reference = reference;
-			while (reference !== 'inertial') {
-				list_bodies[i].position = vect3.sum(1, list_bodies[i].position, -1, reference.position);
-				list_bodies[i].velocity = vect3.sum(1, list_bodies[i].velocity, -1, reference.velocity);
-				reference = reference.reference;
-			}
-			list_bodies[i].get_orbit(list_bodies[i].reference);
+			// Set relative state vectors
+			var relative_state = list_bodies[i].state.get_relative(reference);
+			list_bodies[i].state.set_state(relative_state, reference);
+			list_bodies[i].get_orbit(list_bodies[i].state.reference);
 			console.log(`${list_bodies[i].orbit.shape} - ${list_bodies[i].orbit.special_case}`);
 		}
 	}
@@ -815,3 +831,10 @@ class Scenario {
 		
 	}
 }
+
+// Infobox class
+/*
+	=> associé à un Body
+	=> comporte (ou non) des évènements onClick / onHandle (onHandle pas géré sur mobile I guess)
+	=> à terme rajouter des micros boutons déplaçables
+*/

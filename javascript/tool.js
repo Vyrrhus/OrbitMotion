@@ -78,6 +78,9 @@ class vect3 {
 	get module() {
 		return Math.hypot(this.x, this.y, this.z)
 	}
+	get module_2() {
+		return (Math.square(this.x) + Math.square(this.y) + Math.square(this.z))
+	}
 	get unit() {
 		if (this.module === 0) {
 			return this
@@ -182,6 +185,16 @@ class vect3 {
 						 u.y + v.y,
 						 u.z + v.z)
 	}
+	static add() {
+		var rslt = new vect3(0,0,0);
+		for (var i = 0 ; i < arguments.length ; i++) {
+			rslt = this.sum(1,rslt,1,arguments[i]);
+		}
+		return rslt
+	}
+	static diff(u,v) {
+		return this.sum(1,u,-1,v)
+	}
 	static product(M, u) {
 		return new vect3(u.x * M.x.x + u.y * M.x.y + u.z * M.x.z,
 						 u.x * M.y.x + u.y * M.y.y + u.z * M.y.z,
@@ -246,3 +259,6 @@ const K = new vect3(0,0,1);
 
 const U = new vect3(0.9174992863750878, 0, 0.39773742532128487);
 const V = new vect3(-0.39773742532128487, 0, 0.9174992863750878);
+
+const X = new vect3(0.0904246318, 0.9920151287, -0.08791685);
+const Y = new vect3(-0.4195841911, -0.0421131572, -0.9067389871);
