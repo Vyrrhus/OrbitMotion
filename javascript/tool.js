@@ -78,6 +78,9 @@ class vect3 {
 	get module() {
 		return Math.hypot(this.x, this.y, this.z)
 	}
+	get module_2() {
+		return (Math.square(this.x) + Math.square(this.y) + Math.square(this.z))
+	}
 	get unit() {
 		if (this.module === 0) {
 			return this
