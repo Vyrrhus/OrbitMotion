@@ -766,7 +766,28 @@ class Scenario {
 	
 	// Methods
 	add_body(body, options) {
-		body.init_state(options.x, options.y, options.z, options.vx, options.vy, options.vz, options.reference);
+		if (options.body === undefined) {
+			// Vector elements
+			body.init_state(options.x, options.y, options.z, options.vx, options.vy, options.vz, options.reference);
+		} else {
+			// Kepler elements (KERBAL ONLY - WIP)
+			body.orbit = new Orbit(options.body, 
+								   tool.deg_to_rad(options.i), 
+								   tool.deg_to_rad(options.W), 
+								   options.e, 
+								   options.a, 
+								   tool.deg_to_rad(options.w), 
+								   options.v, 
+								   {h: Math.sqrt(options.a * options.body.G * (1-options.e*options.e)), 
+									w_true:tool.deg_to_rad(options.W + options.w), 
+									u:tool.deg_to_rad(options.w + options.v), l_true:tool.deg_to_rad(options.w + options.v + options.W)});
+			body.orbit.v = body.orbit.true_anomaly = body.orbit.mean_to_anomaly(body.orbit.v);
+			
+			// Set state vectors
+			var state = body.orbit.get_state();
+			body.state.set_state(state, options.body);
+		}
+		
 		this.list_bodies.push(body);
 	}
 	set_kepler() {
@@ -795,14 +816,10 @@ class Scenario {
 			// Add child to reference
 			reference.child.push(list_bodies[i]);
 			
-			// Set state vectors
-			list_bodies[i].reference = reference;
-			while (reference !== 'inertial') {
-				list_bodies[i].position = vect3.sum(1, list_bodies[i].position, -1, reference.position);
-				list_bodies[i].velocity = vect3.sum(1, list_bodies[i].velocity, -1, reference.velocity);
-				reference = reference.reference;
-			}
-			list_bodies[i].get_orbit(list_bodies[i].reference);
+			// Set relative state vectors
+			var relative_state = list_bodies[i].state.get_relative(reference);
+			list_bodies[i].state.set_state(relative_state, reference);
+			list_bodies[i].get_orbit(list_bodies[i].state.reference);
 			console.log(`${list_bodies[i].orbit.shape} - ${list_bodies[i].orbit.special_case}`);
 		}
 	}
