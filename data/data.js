@@ -23,6 +23,46 @@ var SATELLITES = {
 	ECLIPTIC: new Body('ECLIPTIC', 'white', 50, 0)
 }
 
+var KERBAL = {
+	KERBOL: new Body('KERBOL', '#FFF087', 1.7565459e28, 261600),
+	MOHO: new Body('MOHO', '#6C5748', 2.5263314e21, 250),
+	EVE: new Body('EVE', '#473353', 1.2243980e23, 700),
+	GILLY: new Body('GILLY', '#927F71', 1.2420363e17,13),
+	KERBIN: new Body('KERBIN', '#2F3644', 5.2915158e22,600),
+	MUN: new Body('MUN', '#565857', 9.7599066e20,200),
+	MINMUS: new Body('MINMUS', '#A8E4CB', 2.6457580e19,60),
+	DUNA: new Body('DUNA', '#7E381F', 4.5154270e21,320),
+	IKE: new Body('IKE', '#504F50', 2.7821615e20,130),
+	DRES: new Body('DRES', '#5A5555', 3.2190937e20,138),	
+	JOOL: new Body('JOOL', '#3F7C0F', 4.2332127e24,6000),
+	LAYTHE: new Body('LAYTHE', '#31323B', 2.9397311e22,500),
+	VALL: new Body('VALL', '#4F5D62', 3.1087655e21,300),
+	TYLO: new Body('TYLO', '#F6ECDD', 4.2332127e22,600),
+	BOP: new Body('BOP', '#54483F', 3.7261090e19,65),
+	POL: new Body('POL', '#ACA57C', 1.0813507e19,44),
+	EELOO: new Body('EELOO', '#B5BCB1', 1.1149224e21,210),
+	
+}
+
+var _KERBOL_SYSTEM = new Scenario('Kerbol System', {UA: 13599840.256, dT: 86400/60, scale: 466, epoch: new Date(2019,0,1), plane: {x: X, y: Y}});
+//_KERBOL_SYSTEM.add_body(KERBAL.KERBOL, 	{x: 0, y: 0, z: 0, vx: 0, vy: 0, vz: 0});
+//_KERBOL_SYSTEM.add_body(KERBAL.MOHO, 	{i: 7, 		W: 70, 		e: 0.2, 	a: 5263138.304, 	w: 15,	v: 3.14,	body: KERBAL.KERBOL});
+//_KERBOL_SYSTEM.add_body(KERBAL.EVE, 	{i: 2.1, 	W: 15, 		e: 0.01, 	a: 9832684.544, 	w: 0,	v: 3.14,	body: KERBAL.KERBOL});
+//_KERBOL_SYSTEM.add_body(KERBAL.GILLY, 	{i: 12, 	W: 80, 		e: 0.55, 	a: 31500, 			w: 10,	v: 0.9, 	body: KERBAL.EVE});
+//_KERBOL_SYSTEM.add_body(KERBAL.KERBIN, 	{i: 0, 		W: 0, 		e: 0,		a: 13599840.256, 	w: 0,	v: 3.14,	body: KERBAL.KERBOL});
+//_KERBOL_SYSTEM.add_body(KERBAL.MUN, 	{i: 0, 		W: 0, 		e: 0, 		a: 12000, 			w: 0,	v: 1.7, 	body: KERBAL.KERBIN});
+//_KERBOL_SYSTEM.add_body(KERBAL.MINMUS, 	{i: 6, 		W: 78, 		e: 0, 		a: 47000, 			w: 38,	v: 0.9, 	body: KERBAL.KERBIN});
+//_KERBOL_SYSTEM.add_body(KERBAL.DUNA, 	{i: 0.06, 	W: 135.5, 	e: 0.051, 	a: 20726155.264, 	w: 0,	v: 3.14,	body: KERBAL.KERBOL});
+//_KERBOL_SYSTEM.add_body(KERBAL.IKE, 	{i: 0.2, 	W: 0, 		e: 0.03, 	a: 3200, 			w: 0,	v: 1.7, 	body: KERBAL.DUNA});
+//_KERBOL_SYSTEM.add_body(KERBAL.DRES, 	{i: 5, 		W: 280, 	e: 0.145, 	a: 40839348203, 	w: 90,	v: 3.14,	body: KERBAL.KERBOL});
+_KERBOL_SYSTEM.add_body(KERBAL.JOOL, 	{i: 1.304, 	W: 52, 		e: 0.05, 	a: 68773560.320, 	w: 0,	v: 0.1, 	body: KERBAL.KERBOL});
+_KERBOL_SYSTEM.add_body(KERBAL.LAYTHE, 	{i: 0,		W: 0, 		e: 0, 		a: 27184, 			w: 0,	v: 3.14,	body: KERBAL.JOOL});
+_KERBOL_SYSTEM.add_body(KERBAL.VALL, 	{i: 0, 		W: 0, 		e: 0, 		a: 43152, 			w: 0,	v: 0.9, 	body: KERBAL.JOOL});
+_KERBOL_SYSTEM.add_body(KERBAL.TYLO, 	{i: 0.025, 	W: 0, 		e: 0, 		a: 68500, 			w: 0,	v: 3.14,	body: KERBAL.JOOL});
+_KERBOL_SYSTEM.add_body(KERBAL.BOP, 	{i: 15, 	W: 10, 		e: 0.235, 	a: 128500, 			w: 25,	v: 0.9, 	body: KERBAL.JOOL});
+_KERBOL_SYSTEM.add_body(KERBAL.POL, 	{i: 4.25, 	W: 2, 		e: 0.171, 	a: 179890, 			w: 15,	v: 0.9, 	body: KERBAL.JOOL});
+//_KERBOL_SYSTEM.add_body(KERBAL.EELOO, 	{i: 6.15, 	W: 50, 		e: 0.26, 	a: 90118820, 		w: 260,	v: 3.14,	body: KERBAL.KERBOL});
+
 var _SOLAR_SYSTEM 	= new Scenario("Solar System", {dT: 86400, scale: 2e6, epoch: new Date(2019,0,1), plane: {x: I, y: J}});
 _SOLAR_SYSTEM.add_body(BODIES.SUN, 			{x:-1.130770710405938E+05, 	y:1.111341040984885E+06, 	z:-8.582688999394013E+03, 	vx:-1.360829795261448E-02, 	vy:3.428136241289523E-03, 	vz:3.477659644068242E-04});
 _SOLAR_SYSTEM.add_body(BODIES.MERCURY, 		{x:-4.726161342120799E+07, 	y:-4.671439022096695E+07, 	z:4.087209407470208E+05, 	vx:2.476489744104856E+01, 	vy:-3.197373462580866E+01, 	vz:-4.885743761365100E+00});
@@ -48,4 +88,5 @@ _SAT_DEMO.add_body(SATELLITES.GEO, 		{x:38679.025673208154, y:0, z:16767.4202189
 _SAT_DEMO.add_body(SATELLITES.MOLNIYA, 	{x:4.552697954638234e-13, y:-410.27021572905585, z:-7423.792007086785, vx:9.602465253717867, vy:3.2444837841682955e-17, vz:5.870855806880708e-16, reference: BODIES.EARTH});
 
 //const _SCENARIO = _SOLAR_SYSTEM;
-const _SCENARIO = _SAT_DEMO;
+//const _SCENARIO = _SAT_DEMO;
+const _SCENARIO = _KERBOL_SYSTEM;
