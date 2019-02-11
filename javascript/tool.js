@@ -182,16 +182,6 @@ class vect3 {
 						 u.y + v.y,
 						 u.z + v.z)
 	}
-	static add() {
-		var rslt = new vect3(0,0,0);
-		for (var i = 0 ; i < arguments.length ; i++) {
-			rslt = this.sum(1,rslt,1,arguments[i]);
-		}
-		return rslt
-	}
-	static diff(u,v) {
-		return this.sum(1,u,-1,v)
-	}
 	static product(M, u) {
 		return new vect3(u.x * M.x.x + u.y * M.x.y + u.z * M.x.z,
 						 u.x * M.y.x + u.y * M.y.y + u.z * M.y.z,
