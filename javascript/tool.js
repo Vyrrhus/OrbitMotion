@@ -36,15 +36,55 @@ tool = {
 			j = i - f(i) / df(i);
 		} while (Math.abs((j-i) / i) > epsilon)
 		return j
+	},
+	getRGBA: function(color) {
+		if (!color)
+			return;
+		if (color.toLowerCase() === 'transparent')
+			return [0, 0, 0, 0];
+		if (color[0] === '#') {
+			if (color.length < 7) {
+				// convert #RGB and #RGBA to #RRGGBB and #RRGGBBAA
+				color = '#' + color[1] + color[1] + color[2] + color[2] + color[3] + color[3] + 	(color.length > 4 ? color[4] + color[4] : '');
+			}
+			return [parseInt(color.substr(1, 2), 16),
+					parseInt(color.substr(3, 2), 16),
+					parseInt(color.substr(5, 2), 16),
+					color.length > 7 ? parseInt(color.substr(7, 2), 16)/255 : 1];
+		}	
+		if (color.indexOf('rgb') === -1) {
+			// convert named colors
+			var temp_elem = document.body.appendChild(document.createElement('fictum')); // intentionally use unknown tag to lower chances of css rule override with !important
+			var flag = 'rgb(1, 2, 3)'; // this flag tested on chrome 59, ff 53, ie9, ie10, ie11, edge 14
+			temp_elem.style.color = flag;
+			if (temp_elem.style.color !== flag)
+				return; // color set failed - some monstrous css rule is probably taking over the color of our object
+			temp_elem.style.color = color;
+			if (temp_elem.style.color === flag || temp_elem.style.color === '')
+				return; // color parse failed
+			color = getComputedStyle(temp_elem).color;
+			document.body.removeChild(temp_elem);
+		}
+		if (color.indexOf('rgb') === 0) {
+			if (color.indexOf('rgba') === -1)
+				color += ',1'; // convert 'rgb(R,G,B)' to 'rgb(R,G,B)A' which looks awful but will pass the regxep below
+				return color.match(/[\.\d]+/g).map(function (a) { return +a });
+		}
+	},
+	setOpacity: function(color, opacity) {
+		return `rgba(${this.getRGBA(color).toString()})`.replace(/[^,]+(?=\))/, opacity.toString())
 	}
 };
 
+// Math functions
 Math.square = function(value) {
 	return value * value;
 };
 Math.cube = function(value) {
 	return Math.pow(value, 3);
 };
+
+// Objects functions
 Number.prototype.pad = function() {
 	return ('0' + this).slice(-2);
 }
@@ -58,6 +98,11 @@ Date.prototype.strTime = function() {
 }
 Date.prototype.str = function() {
 	return this.strDate() + " " + this.strTime()
+}
+
+// Color to rgba
+function RGBA(color) {
+	
 }
 
 // Vector class
@@ -251,6 +296,39 @@ class quat {
 		return new vect3(P_rot.x, P_rot.y, P_rot.z);
 	}
 }
+
+class stateVector {
+			// Constructor
+			constructor(state,body) {
+				this.position = new vect3(state.position.x,state.position.y,state.position.z);
+				this.velocity = new vect3(state.velocity.x,state.velocity.y,state.velocity.z);
+				this.reference = body;
+			}
+			
+			// Methods
+			get_absolute() {
+				//	Variables initialization
+				var ref = this.reference;
+				var abs_state = {position: this.position, velocity: this.velocity};
+				
+				// Iteration
+				while (ref !== null) {
+					abs_state.position = vect3.add(abs_state.position, ref.state.position);
+					abs_state.velocity = vect3.add(abs_state.velocity, ref.state.velocity);
+					ref = ref.state.reference;
+				}
+				return abs_state
+			}
+			get_relative(ref) {
+				var absolute_state = this.get_absolute();
+				var absolute_ref = ref.state.get_absolute();
+				var relative_state = {position: vect3.diff(absolute_state.position,
+														   absolute_ref.position),
+									  velocity: vect3.diff(absolute_state.velocity,
+														   absolute_ref.velocity)};
+				return relative_state
+			}
+		}
 
 // Inertial coordinate vectors
 const I = new vect3(1,0,0);

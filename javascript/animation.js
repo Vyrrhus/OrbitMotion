@@ -1,16 +1,16 @@
 // CANVAS
 var CANVAS = {
 	BACKGROUND: document.getElementById('background'),
-	TRAJECTORY: document.getElementById('orbit'),
-	BODY: document.getElementById('animation'),
+	SKETCH: document.getElementById('orbit'),
+	SKETCH2: document.getElementById('animation'),
 	CONTROL: document.getElementById('control')
 };
 
 // CONTEXT
 var CONTEXT = {
 	BACKGROUND: CANVAS.BACKGROUND.getContext('2d'),
-	TRAJECTORY: CANVAS.TRAJECTORY.getContext('2d'),
-	BODY: CANVAS.BODY.getContext('2d'),
+	SKETCH: CANVAS.SKETCH.getContext('2d'),
+	SKETCH2: CANVAS.SKETCH2.getContext('2d'),
 	CONTROL: CANVAS.CONTROL.getContext('2d')
 };
 
@@ -23,6 +23,7 @@ var CENTER = {x: Math.floor(WIDTH/2), y: Math.floor(HEIGHT/2)};
 var PLANE = {
 	x: I, 
 	y: J,
+	z: K,
 	draw: function(ctx) {
 		ctx.clearRect(0,HEIGHT-230,230,230);
 		I.draw(ctx, this, {type: 'vec', text: 'I', center: {x: 100, y: HEIGHT-100}});
@@ -161,6 +162,9 @@ function start() {
 	// Focus
 	FOCUS.num 		= SCENARIO.list_bodies.indexOf(SCENARIO.focus);
 	FOCUS.body 		= SCENARIO.focus;
+	for (var i = 0 ; i < SCENARIO.list_bodies.length ; i++) {
+		SCENARIO.list_bodies[i].sketch.focus = FOCUS.body;
+	}
 	console.log(`FOCUS on ${FOCUS.body.name}`);
 	
 	// Scale
@@ -175,6 +179,7 @@ function start() {
 	// Plane
 	PLANE.x			= SCENARIO.plane.x;
 	PLANE.y			= SCENARIO.plane.y;
+	PLANE.z 		= vect3.cross(PLANE.x, PLANE.y);
 	PLANE.draw(CONTEXT.CONTROL);
 	
 	// Draw sketch
@@ -182,66 +187,6 @@ function start() {
 	
 	// Run animation
 	requestAnimationFrame(animation);
-	
-	/*
-	list_body = init()
-	LIST_OBJ = list_body;
-	FOCUS.body = LIST_OBJ[FOCUS.num];
-	
-	 Draw elements before running
-	SCALE.draw(CONTEXT.CONTROL);
-	PLANE.draw(CONTEXT.CONTROL);
-	TIME.draw_date(CONTEXT.CONTROL);
-	draw_body();
-	
-	requestAnimationFrame(animation);
-	
-	function init() {
-		list_bodies = []
-		for (var element in BODIES) {
-			if (element in VECTORS) {
-				e = VECTORS[element];
-				BODIES[element].init_state(e[0], e[1], e[2], e[3], e[4], e[5]);
-			}
-			list_bodies.push(BODIES[element]);
-		}
-		return set_kepler(list_bodies);
-	}
-	function set_kepler(list_body) {
-		// Sort by mass
-		list_body.sort(function(a,b) {
-			return (b.mass - a.mass)
-		});
-	
-		// Iterate through bodies
-		for (var i = 1 ; i < list_body.length ; i++) {
-			console.log(`+ Add: ${list_body[i].name}`);
-			var reference = list_body[0];
-			for (var j = i-1 ; j > 0 ; j--) {
-				var distance = Body.get_distance(list_body[i], list_body[j]);
-				var SOI = list_body[j].SOI;
-				if (distance < SOI) {
-					// Reference found
-					reference = list_body[j];
-					j = 0;
-				}
-			}
-			// Set children
-			reference.child.push(list_body[i]);
-		
-			// Set state vectors
-			list_body[i].reference = reference;
-			while (reference !== 'inertial') {
-				list_body[i].position = vect3.sum(1,list_body[i].position, -1, reference.position);
-				list_body[i].velocity = vect3.sum(1, list_body[i].velocity, -1, reference.velocity);
-				reference = reference.reference;
-			}
-			list_body[i].get_orbit(list_body[i].reference);
-		}
-	
-		// Return list 
-		return list_body
-	}*/
 }
 	
 function animation(time) {
@@ -256,16 +201,22 @@ function animation(time) {
 }
 
 function draw_body() {
-	CONTEXT.BODY.clearRect(0,0,WIDTH,HEIGHT);
+	CONTEXT.SKETCH.clearRect(0,0,WIDTH,HEIGHT);
+	
+	for (var i = 0 ; i < LIST_OBJ.length ; i++) {
+		LIST_OBJ[i].sketch.build(SCALE.value, PLANE, CENTER);
+	}
+	
+	LIST_OBJ.sort(function(a,b) {
+		return (a.sketch.screen.z - b.sketch.screen.z)
+	});
 	
 	for (var i = 0 ; i < LIST_OBJ.length ; i++) {
 		// Body
 		var body = LIST_OBJ[i];
 		
 		// Sketch
-		body.sketch.set_radius(SCALE.value, SCALE.unit);
-		body.sketch.set_position(CENTER, SCALE.value, SCALE.unit, FOCUS.body, PLANE);
-		body.sketch.draw(CONTEXT.BODY, CONTEXT.TRAJECTORY);
+		body.sketch.draw(CONTEXT.SKETCH, SCALE.value, PLANE, CENTER, CONTEXT.SKETCH2);
 	}
 }
 

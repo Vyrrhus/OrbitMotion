@@ -12,39 +12,10 @@ class Body {
 		// Bodies within SOI
 		this.child = [];
 		
-		// State vectors (relative to the reference)
-		this.state = {
-			position: new vect3(0,0,0),
-			velocity: new vect3(0,0,0),
-			reference: null,
-			get_absolute: function() {
-				//	Variables initialization
-				var ref = this.reference;
-				var abs_state = {position: this.position, velocity: this.velocity};
-				
-				// Iteration
-				while (ref !== null) {
-					abs_state.position = vect3.add(abs_state.position, ref.state.position);
-					abs_state.velocity = vect3.add(abs_state.velocity, ref.state.velocity);
-					ref = ref.state.reference;
-				}
-				return abs_state
-			},
-			get_relative: function(ref) {
-				var absolute_state = this.get_absolute();
-				var absolute_ref = ref.state.get_absolute();
-				var relative_state = {position: vect3.diff(absolute_state.position,
-														   absolute_ref.position),
-									  velocity: vect3.diff(absolute_state.velocity,
-														   absolute_ref.velocity)};
-				return relative_state
-			},
-			set_state: function(state, ref) {
-				this.position = state.position;
-				this.velocity = state.velocity;
-				this.reference = ref;
-			}
-		}
+		// State
+		this.state = new stateVector({position: {x: 0, y: 0, z: 0}, 
+									  velocity: {x: 0, y: 0, z: 0}}, 
+									 null);
 		
 		// Keplerian orbit
 		this.orbit = null;
@@ -187,8 +158,7 @@ class Body {
 		}
 		
 		// Get state vectors
-		var state = this.orbit.get_state();
-		this.state.set_state(state, this.state.reference);
+		this.state = new stateVector(this.orbit.get_state(), this.state.reference);
 		
 		// SOI Checks
 		// 1st check: out of parent SOI (if not around primary object)
@@ -541,183 +511,170 @@ class N_body {
 // Sketch class
 class Sketch {
 	// Constructor
-	constructor(self) {
+	constructor(body) {
 		// Properties
-		this.body 			= self;
-		this.color 			= self.color;	// element color
-		this.font 			= '10px Arial';	// font for label
-		this.color_font		= '#BBB';		// color for font
-		this.show = {
-			body: 		true,
-			label: 		true,
-			infobox: 	false,
-			SOI: 		true,
-			orbit: 		false,
-			vector: 	false
-		};
-		this.store_orbit 	= false;		// if true, store orbit data to display it on zoom / focus change
-		this.min_radius		= 5;			// minimum pixel to display on screen
+		this.body 		= body;
+		this.color		= body.color;
+		this.font		= 'px Arial';
+		this.color_font	= '#BBB';
 		
-		// Sketch positions & dimensions
+		this.show = {
+			body: 			true,
+			label: 			true,
+			infobox: 		false,
+			SOI: 			true,
+			vector: {
+				position: 	false,
+				velocity: 	false
+			}
+		};
+		
+		// Toggle
+		this.toggle = {
+			SOI: function() {
+				this.show.SOI = !this.show.SOI;
+			},
+			body: function() {
+				this.show.body = !this.show.body;
+			}
+		};
+		
+		this.focus = null;
+		this.min_radius = 5;
 		this.radius = this.min_radius;
-		this.SOI_radius = 0;
-		this.screen_position = {
+		this.radius_SOI = 0;
+		
+		this.screen = {
 			x: 0,
-			y: 0
-		}
+			y: 0,
+			z: 0,
+		};
 		this.store = [];
-		this.max_length = 600;
+		this.length = 0;
+		this.max_length = 150;
 	}
 	
 	// Methods
-	draw(ctx_body, ctx_path) {
-		/*
-			Draw body on canvas, labels & orbit path
-		*/
-		
-		// Not showing
+	draw(ctx, scale, plane, center, ctx_Infinity) {
 		if (!this.show.body) {
-			return	
+			this.store = [];
+			return
 		}
 		
-		// Body
+		// SOI
 		if (this.show.SOI) {
-			ctx_body.beginPath();
-			ctx_body.arc(this.screen_position.x, this.screen_position.y, this.SOI_radius, 0, 2*Math.PI);
-			ctx_body.fillStyle = 'rgba(205,92,92,0.5)';
-			ctx_body.fill();
-			ctx_body.closePath();
+			ctx.beginPath();
+			ctx.arc(this.screen.x, this.screen.y, this.radius_SOI, 0, 2*Math.PI);
+			ctx.fillStyle = 'rgba(205,92,92,0.5)';
+			ctx.fill();
+			ctx.closePath();
 		}
-		ctx_body.beginPath();
-		ctx_body.arc(this.screen_position.x, this.screen_position.y, this.radius, 0, 2*Math.PI);
-		ctx_body.fillStyle = this.color;
-		ctx_body.fill();
-		ctx_body.closePath();
+		// POSITION VECTOR
+		if (this.show.vector.position) {
+			/*
+				show vector position
+			*/
+		}
 		
-		// Label
+		// BODY
+		ctx.beginPath();
+		ctx.arc(this.screen.x, this.screen.y, this.radius, 0, 2*Math.PI);
+		ctx.fillStyle = this.color;
+		ctx.fill();
+		ctx.closePath();
+		
+		// VELOCITY VECTOR
+		if (this.show.vector.velocity) {
+			/*
+				show velocity vector
+			*/
+		}
+		
+		// LABEL
 		if (this.show.label) {
-//			ctx_body.font = this.font;
-			ctx_body.font = `${8 + 2/5*this.radius}px Arial`;
-			ctx_body.fillStyle = this.color_font;
-			ctx_body.textBaseline = "bottom";
-			ctx_body.textAlign = "center";
-			ctx_body.fillText(this.body.name, this.screen_position.x,
-								  this.screen_position.y - this.radius*1.15); // Minimum 5 px + 5% offset
+			ctx.font = `${8 + 2/5 * this.radius}${this.font}`;
+			ctx.fillStyle = this.color_font;
+			ctx.textBaseline = 'bottom';
+			ctx.textAlign = 'center';
+			ctx.fillText(this.body.name, this.screen.x, this.screen.y - this.radius * 1.15);
 		}
 		
-		// Trajectory
-		if (this.show.orbit) {
-			ctx_path.beginPath();
-			ctx_path.rect(this.screen_position.x, this.screen_position.y, 1, 1);
-			ctx_path.fillStyle = this.color;
-			ctx_path.fill();
-			ctx_path.closePath();
+		// STORED POINTS
+		/*
+			différencier 0, else et Infinity
+		*/
+		if (this.body === this.focus) {
+			return
+		}
+		switch (this.length) {
+			case Infinity:
+				ctx_Infinity.beginPath();
+				ctx_Infinity.rect(this.screen.x, this.screen.y, 1, 1);
+				ctx_Infinity.fillStyle = this.color;
+				ctx_Infinity.fill();
+				ctx_Infinity.closePath();
+				break;
+			case 0:
+				// Nothing happens
+				break;
+			default:
+				for (var i = 0 ; i < this.store.length - 1 ; i++) {
+					var state = this.store[i];
+					var position = this.convert(state, scale, plane, center);
+					ctx.beginPath();
+					ctx.rect(position.x, position.y, 1, 1);
+					ctx.fillStyle = tool.setOpacity(this.color, i/this.store.length);
+					ctx.fill();
+					ctx.closePath();
+				}
+				break;
 		}
 		
 	}
-	set_position(center, scale, scale_unit, focus, plane) {
-		/*
-			Update screen position
-			We will consider that everything is in km for now
-			center: {x: WIDTH/2, y:HEIGHT/2}
-			scale: km/px or UA/px
-			scale_unit: 'km' or 'UA'
-			focus: Body class
-			plane: {x:vect3, y:vect3}
-		*/
-		var position = this.body.state.get_absolute().position;
-		
-		// Set focus
-		position = vect3.diff(position, focus.state.get_absolute().position);
-		
-		// Store position
-		if (this.store_orbit) {
-//			console.log(this.store.length);
-//			if (this.store.length > this.max_length) {
-//				this.store.shift();
-//			}
-			this.store.push(position);
-		}
-		
-		// Scale in px
-		if (scale_unit === 'UA') {
-			scale = tool.UA_to_km(scale);
-		}
-		position = vect3.scale(1/scale, position);
-		
-		if (this.show.vector) {
-			position.draw(CONTEXT.BODY, PLANE, {color: this.color, length:position.module});
-		}
-		
-		// Plane projection and translation to the center
-		this.screen_position = {
-			x: vect3.dot(position, plane.x) + center.x,
-			y: - vect3.dot(position, plane.y) + center.y
-		};
+	set_length(length) {
+		this.length = length;
 	}
-	set_radius(scale, scale_unit) {
-		/*
-			Scale radius body and convert it in pixel.
-			> 'scale' represents the total distance in 1 pixel
-		*/
-		// Convert 
-		if (scale_unit === 'UA') {
-			scale = tool.UA_to_km(scale);
+	toggle_length() {
+		console.log(this.length);
+		if (this.length === 0 ) {
+			this.length = this.max_length;
+		} else {
+			this.length = 0;
 		}
-		// Get radius in px
+	}
+	build(scale, plane, center) {
+		// Radius
 		var radius = Math.round(this.body.radius / scale);
-		if (this.body.orbit !== null) {
-			var SOI_radius = Math.round(this.body.SOI / scale);
-		}
+		radius *= (1 + this.screen.z / 200);
+		
 		if (radius < this.min_radius) {
 			radius = this.min_radius;
 		}
 		this.radius = radius;
-		this.SOI_radius = SOI_radius;
-	}
-	toggle_orbit() {
-		this.show.orbit = !this.show.orbit;
-		this.store_orbit = !this.store_orbit;
-		if (!this.store_orbit) {
-			this.reset_store();
+		
+		// SOI radius
+		if (this.body.orbit !== null) {
+			this.radius_SOI = Math.round(this.body.SOI / scale);
 		}
-	}
-	toggle_SOI() {
-		this.show.SOI = !this.show.SOI;
-	}
-	reset_store() {
-		this.store = [];
-	}
-	draw_stored_position(ctx, center, scale, scale_unit, focus, plane) {
-		for (var i = 0 ; i < this.store.length ; i++) {
-			var position = this.store[i];
-			var reference_body = this.body.reference;
-			
-			// Set focus
-			position = vect3.diff(position, focus.sketch.store[i]);
-			
-			// Scale in px
-			if (scale_unit === 'UA') {
-				scale = tool.UA_to_km(scale);
-			}
-			position = vect3.scale(1/scale, position);
-			
-			// Plane projection and translation to the center
-			var screen_position = {x: vect3.dot(position, plane.x) + center.x,
-								   y: - vect3.dot(position, plane.y) + center.y};
-			ctx.beginPath();
-			ctx.rect(screen_position.x, screen_position.y, 1, 1);
-			ctx.fillStyle = this.color;
-			ctx.fill();
-			ctx.closePath();
+		
+		if (this.body !== this.focus) {
+			var a = "osef";
 		}
+		
+		// Store
+		this.store.push(this.body.state);
+		while (this.store.length > this.length + 1) {
+			this.store.shift();
+		}
+		this.screen = this.convert(this.store[this.store.length - 1], scale, plane, center);
 	}
-	
-	// Events
-	/*
-		Put events such as onclick to toggle legend
-	*/
-	
+	convert(state, scale, plane, center) {
+		var position = state.get_relative(this.focus).position;
+		position = vect3.scale(1/scale, position);
+		return {x: vect3.dot(position, plane.x) + center.x,
+			    y: - vect3.dot(position, plane.y) + center.y,
+			    z: vect3.dot(position, plane.z)}
+	}
 }
 
 // Scenario class
@@ -785,7 +742,7 @@ class Scenario {
 			
 			// Set state vectors
 			var state = body.orbit.get_state();
-			body.state.set_state(state, options.body);
+			body.state = new stateVector(state, options.body);
 		}
 		
 		this.list_bodies.push(body);
@@ -818,7 +775,7 @@ class Scenario {
 			
 			// Set relative state vectors
 			var relative_state = list_bodies[i].state.get_relative(reference);
-			list_bodies[i].state.set_state(relative_state, reference);
+			list_bodies[i].state = new stateVector(relative_state, reference);
 			list_bodies[i].get_orbit(list_bodies[i].state.reference);
 			console.log(`${list_bodies[i].orbit.shape} - ${list_bodies[i].orbit.special_case}`);
 		}

@@ -47,12 +47,12 @@ window.onload = function() {
 
 // Zoom
 document.addEventListener('wheel', function(event) {
-	SCALE.value *= (1 + Math.sign(event.deltaY) * 5/100) ;
+	SCALE.value *= (1 + Math.sign(event.deltaY) * 5/100);
 	if (SCALE.value < 1) {SCALE.value =1}
-	CONTEXT.TRAJECTORY.clearRect(0,0,WIDTH,HEIGHT);
-	for (var i = 0 ; i < LIST_OBJ.length ; i++) {
-		LIST_OBJ[i].sketch.draw_stored_position(CONTEXT.TRAJECTORY, CENTER, SCALE.value, SCALE.unit, FOCUS.body, PLANE);	
-	}
+//	CONTEXT.TRAJECTORY.clearRect(0,0,WIDTH,HEIGHT);
+//	for (var i = 0 ; i < LIST_OBJ.length ; i++) {
+//		LIST_OBJ[i].sketch.draw_stored_position(CONTEXT.TRAJECTORY, CENTER, SCALE.value, SCALE.unit, FOCUS.body, PLANE);	
+//	}
 	
 	// Clear and redraw bodies
 		if (PAUSE) {
@@ -66,16 +66,16 @@ document.addEventListener('keypress', function(event) {
 	
 	// Toggle orbit
 	if (event.key === 'o') {
-		CONTEXT.TRAJECTORY.clearRect(0,0,WIDTH,HEIGHT);
+//		CONTEXT.TRAJECTORY.clearRect(0,0,WIDTH,HEIGHT);
 		for (var i = 0 ; i < LIST_OBJ.length ; i++) {
-			LIST_OBJ[i].sketch.toggle_orbit();
+			LIST_OBJ[i].sketch.toggle_length();
 		}
 	}
 	
 	// Toggle SOI
 	if (event.key === 'p') {
 		for (var i = 0 ; i < LIST_OBJ.length ; i++) {
-			LIST_OBJ[i].sketch.toggle_SOI();
+			LIST_OBJ[i].sketch.toggle.SOI();
 		}
 		draw_body();
 	}
@@ -110,10 +110,11 @@ document.addEventListener('keypress', function(event) {
 			FOCUS.num = 0;
 		}
 		FOCUS.body = LIST_OBJ[FOCUS.num];
-		CONTEXT.TRAJECTORY.clearRect(0,0,WIDTH,HEIGHT);
+//		CONTEXT.TRAJECTORY.clearRect(0,0,WIDTH,HEIGHT);
 		for (var i = 0 ; i < LIST_OBJ.length ; i++) {
-			LIST_OBJ[i].sketch.reset_store();
-			LIST_OBJ[i].sketch.draw_stored_position(CONTEXT.TRAJECTORY, CENTER, SCALE.value, SCALE.unit, FOCUS.body, PLANE);	
+			LIST_OBJ[i].sketch.focus = FOCUS.body;
+//			LIST_OBJ[i].sketch.reset_store();
+//			LIST_OBJ[i].sketch.draw_stored_position(CONTEXT.TRAJECTORY, CENTER, SCALE.value, SCALE.unit, FOCUS.body, PLANE);	
 		}
 		console.log(`FOCUS set on : ${FOCUS.body.name}`)
 		if (PAUSE) {
@@ -148,25 +149,24 @@ document.addEventListener('keypress', function(event) {
 				PLANE.x = quat.rotate(PLANE.x, rotation, PLANE.y);
 				break;
 			case 'a':
-				var z = vect3.cross(PLANE.x, PLANE.y);
-				PLANE.x = quat.rotate(PLANE.x, rotation, z);
-				PLANE.y = quat.rotate(PLANE.y, rotation, z);
+				PLANE.x = quat.rotate(PLANE.x, rotation, PLANE.z);
+				PLANE.y = quat.rotate(PLANE.y, rotation, PLANE.z);
 				break;
 			case 'e':
 				rotation *= -1;
-				var z = vect3.cross(PLANE.x, PLANE.y);
-				PLANE.x = quat.rotate(PLANE.x, rotation, z);
-				PLANE.y = quat.rotate(PLANE.y, rotation, z);
+				PLANE.x = quat.rotate(PLANE.x, rotation, PLANE.z);
+				PLANE.y = quat.rotate(PLANE.y, rotation, PLANE.z);
 				break;
 			default:
 				return
 		}
+		PLANE.z = vect3.cross(PLANE.x, PLANE.y);
 		
 		// Clear and redraw orbits
-		CONTEXT.TRAJECTORY.clearRect(0,0,WIDTH,HEIGHT);
-		for (var i = 0 ; i < LIST_OBJ.length ; i++) {
-			LIST_OBJ[i].sketch.draw_stored_position(CONTEXT.TRAJECTORY, CENTER, SCALE.value, SCALE.unit, FOCUS.body, PLANE);
-		}
+//		CONTEXT.TRAJECTORY.clearRect(0,0,WIDTH,HEIGHT);
+//		for (var i = 0 ; i < LIST_OBJ.length ; i++) {
+//			LIST_OBJ[i].sketch.draw_stored_position(CONTEXT.TRAJECTORY, CENTER, SCALE.value, SCALE.unit, FOCUS.body, PLANE);
+//		}
 		
 		// Clear and redraw bodies
 		if (PAUSE) {
