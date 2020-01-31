@@ -4,8 +4,8 @@ _SCRIPT.add_body(BODIES.EARTH, 		{x:-2.565776021787787E+07, 	y:1.459776792940268
 //_SCRIPT.add_body(SATELLITES.MOLNIYA, 	{x:4.552697954638234e-13, y:-410.27021572905585, z:-7423.792007086785, vx:9.602465253717867, vy:3.2444837841682955e-17, vz:5.870855806880708e-16, reference: BODIES.EARTH});
 //_SCRIPT.add_body(SATELLITES.GEO, 		{x:38679.025673208154, y:0, z:16767.420218906234, vx:0, vy:3.0748760710235925, vz:0, reference: BODIES.EARTH});
 
-var nb_plans = 32;
-var nb_sat = 10;
+var nb_plans = 3;
+var nb_sat = 3;
 
 for (var i = 0 ; i < nb_plans ; i++) {
 	for (var j = 0 ; j < nb_sat ; j++) {
