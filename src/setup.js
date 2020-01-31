@@ -98,13 +98,12 @@ function start() {
 }
 function animation(time) {
 	TIME.tick();
-	if (PAUSE) {
-		return requestAnimationFrame(animation);
-	}
 	
-	run();
-	draw_body();
-	requestAnimationFrame(animation);
+    if (!PAUSE) {
+        run();
+        draw_body();
+    }
+    
 	ANIMATION_REQUEST = requestAnimationFrame(animation);
 }
 function run() {
