@@ -71,13 +71,13 @@ document.addEventListener('keyup', function(event) {
 // KEYPRESS EVENT
 document.addEventListener('keypress', function(event) {
 	
-	// Toggle orbit
-	if (event.key === 'o') {
-		CONTEXT.SKETCH2.clearRect(0,0,WIDTH,HEIGHT);
-		for (var i = 0 ; i < LIST_OBJ.length ; i++) {
-			LIST_OBJ[i].sketch.switch_mode();
-		}
-	}
+//	// Toggle orbit
+//	if (event.key === 'o') {
+//		CONTEXT.SKETCH2.clearRect(0,0,WIDTH,HEIGHT);
+//		for (var i = 0 ; i < LIST_OBJ.length ; i++) {
+//			LIST_OBJ[i].sketch.switch_mode();
+//		}
+//	}
 	
 	// Toggle SOI
 	if (event.key === 'p') {
