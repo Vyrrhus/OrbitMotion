@@ -43,6 +43,9 @@ var _SCENARIO = 'sat_demo';
 // PAUSE
 var PAUSE = false;
 
+// ANIMATION REQUEST
+var ANIMATION_REQUEST = null;
+
 // LIST of OBJs
 var LIST_OBJ = null;
 var LIST_TO_SORT = null;
@@ -55,6 +58,9 @@ function start() {
 		
 		Draw all HUD elements
 	*/
+    // Reset
+    PAUSE = false;
+    
 	// Load scenario
 	var SCENARIO 	= _SCENARIO;	//_SOLAR_SYSTEM;
 	SCENARIO.init();
@@ -88,17 +94,17 @@ function start() {
 	draw_body();
 	
 	// Run animation
-	requestAnimationFrame(animation);
+	ANIMATION_REQUEST = requestAnimationFrame(animation);
 }
 function animation(time) {
 	TIME.tick();
-	if (PAUSE) {
-		return requestAnimationFrame(animation);
-	}
 	
-	run();
-	draw_body();
-	requestAnimationFrame(animation);
+    if (!PAUSE) {
+        run();
+        draw_body();
+    }
+    
+	ANIMATION_REQUEST = requestAnimationFrame(animation);
 }
 function run() {
 	for (var i = 0 ; i < LIST_OBJ.length ; i++) {

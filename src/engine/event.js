@@ -10,7 +10,7 @@ class Event {
     
     // METHODS
     check() {
-        var TOF_list = [this.out_of_SOI(), this.crash(), this.encounter()]
+        var TOF_list = [this.out_of_SOI(), this.crash()]
         var TOF = null;
         for (let i = 0 ; i < TOF_list.length ; i++) {
             if (!TOF_list[i]) {

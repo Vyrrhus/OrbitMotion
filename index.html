@@ -4,6 +4,7 @@
 <head>
     <meta charset="utf-8"/>
 	<link rel="stylesheet" type="text/css" href="./stylesheet/main.css">
+    <link href='https://fonts.googleapis.com/css?family=Oswald:400' rel='stylesheet' type='text/css'>
 <!--    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>-->
     <title>Planetary motion</title>
     <link href = "#" rel="icon">
@@ -15,9 +16,42 @@
 	<canvas id="orbit"></canvas>
 	<canvas id="animation"></canvas>
 	<canvas id="control"></canvas>
-<!--
-	<canvas id="text"></canvas>
--->
+    
+<!--UI BUTTONS-->
+    
+    <!--SCENARIOS-->
+    
+    <div id="scenarioButt" class="butt"> SCENARIOS
+        <ul id="list">
+            <li id="constellation"  class="butt" onclick="loadScenario('constellation')">   CONSTELLATION</li>
+            <li id="solarsystem"    class="butt" onclick="loadScenario('solar_system')">    SOLAR SYSTEM</li>
+            <li id="kerbolsystem"   class="butt" onclick="loadScenario('kerbol_system')">   KERBOL SYSTEM</li>
+            <li id="joolsystem"     class="butt" onclick="loadScenario('jool_system')">        JOOL SYSTEM</li>
+            <li id="demosats"       class="butt" onclick="loadScenario('sat_demo')">    DEMO SATS</li>
+        </ul>
+    </div>
+    
+    <!--  HELP BUTTON  -->
+    
+    <div id="helpButt" class="butt" onclick="showHelp()"> HELP ME PLEASE</div>
+    <div id="helpContent">
+        <div id="helpBackground" onclick="hideHelp()"></div>
+        <div id="helpInner" class="centered">
+            <div id="help" class="centered">
+                <h2>WHAT IS THIS ?</h2>
+                <p>This is a simulation of celestial bodies with a Keplerian motion. Watch a (small) mega-constellation orbiting Earth, discover the wonders of the Jovian system with its various moons, explore the Solar System as a whole or even other stellar systems beyond imagination! </p>
+                <p>It's also a work in progress :)</p>
+                
+                <h2>SO HOW DO I...</h2>
+                <p>Get started with the current <em>SCENARIO</em> or else, choose or create one. You might want to have a look on the simulation's <em>SETTINGS</em> before running it. Then, simply click or press SPACE.</p>
+                <p>You can use + and - keys to control time, Z/S, Q/D and A/E to move the camera around, P and O to switch modes.</p>
+                <p> Toggle [ and ] to switch the origin body (with all motion relative to it)</p>
+                
+                <h2>WHO CAN I THANK FOR THAT?</h2>
+                <p>I'm the one. Please go and visit my <a href="https://www.twitter.com/vyrrhus">Twitter</a>.</p>
+            </div>
+        </div>
+    </div>
 	
 <!--JAVASCRIPT SOURCES-->
 	
@@ -47,6 +81,9 @@
 	
 	<!--	EVENT	-->
 	<script src="src/events/event.js"></script>
+    
+    <!--	UI     	-->
+    <script src="js/ui.js"></script>
 	
 </body>
 </html>

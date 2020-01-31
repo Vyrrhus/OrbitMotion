@@ -75,3 +75,17 @@ const CONSTELLATION = {
 	SAT29:			new Body('SAT29', 'white', 5000, 0),
 	SAT30:			new Body('SAT30', 'white', 5000, 0),
 };
+
+const SATs = {
+                _1: new Body('SAT 1', '#FF0000', 0, 0),
+                _2: new Body('SAT 2', '#FF5500', 0, 0),
+                _3: new Body('SOI TEST', '#55FF99', 0, 0),
+                _4: new Body('CRASH TEST', '#5555FF', 0, 0),
+                _5: new Body('SAT 5', '#FF9900', 0, 0),
+                _6: new Body('SAT 6', '#FF0099', 0, 0)
+             }
+
+// Inclined SATS crossing MOON's orbit
+const ENCOUNTER = {
+    a: new Body('CIRCULAR INCLINED', '#00FF99', 0, 0)
+}

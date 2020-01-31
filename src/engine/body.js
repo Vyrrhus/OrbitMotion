@@ -38,6 +38,14 @@ class Body {
 	}
 	
 	// Methods
+    init() {
+        this.child = [];
+        this.state = new State(this, null, {x:0,y:0,z:0,vx:0,vy:0,vz:0});
+        this.orbit = null;
+        this.n_body = null;
+        this.sketch = new Sketch(this);
+        this.event = new Event(this);
+    }
 	init_state(options, reference) {
 		/*
 			Initialization of state & reference
