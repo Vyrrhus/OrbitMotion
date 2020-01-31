@@ -112,17 +112,21 @@ class Sketch {
 		if (!this.run) {return}
 		switch (this.mode) {
 			case 'comet':
-				for (var i = 1 ; i < this.previous.length ; i++) {
-					var focus_previous = this.focus.sketch.previous;
+                var focus_previous = this.focus.sketch.previous;
+                var state_0 = this.previous[this.previous.length-1].on_screen(focus_previous[this.previous.length - 1], scale, plane, center);
+				for (var i = 2 ; i < this.previous.length ; i++) {
 					var index = this.previous.length - i;
 					var state = this.previous[index].on_screen(focus_previous[index], scale, plane, center);
 					
 					// Draw
-					ctx.beginPath();
-					ctx.rect(state.position.x, state.position.y, 1, 1);
-					ctx.fillStyle = tool.setOpacity(this.color, 1-i/this.nb_points_saved);
-					ctx.fill();
-					ctx.closePath();
+                    if (Math.hypot((state_0.position.x - state.position.x), (state_0.position.y - state.position.y)) > 10) {
+                        state_0 = state;
+					   ctx.beginPath();
+					   ctx.rect(state.position.x, state.position.y, 1, 1);
+					   ctx.fillStyle = tool.setOpacity(this.color, 1-i/this.nb_points_saved);
+					   ctx.fill();
+					   ctx.closePath();
+                    }
 				}
 				break;
 			case 'default':
