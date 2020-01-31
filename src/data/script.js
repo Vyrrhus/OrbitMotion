@@ -74,6 +74,9 @@ class Script {
 			body:				<body> to orbit around
 			
 		*/
+        // Reset the body
+        body.init();
+        
 		// State definition
 		if (options.position === undefined) {
 			if (options.x !== undefined && options.y !== undefined && options.z !== undefined) {
@@ -169,8 +172,6 @@ class Script {
 			_SCENARIO = _SCRIPT;
 			callback();
 		};
-			
-			callback;
 		script.onerror = function() {
 			console.log('Something wrong happened while loading script.');
 		}
