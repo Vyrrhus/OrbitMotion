@@ -9,7 +9,7 @@ _SCRIPT.add_body(KERBAL.MUN, 	{i: 0, 		W: 0, 		e: 0, 		a: 12000, 			w: 0,	v: 1.7
 _SCRIPT.add_body(KERBAL.MINMUS, {i: 6, 		W: 78, 		e: 0, 		a: 47000, 			w: 38,	v: 0.9, 	body: KERBAL.KERBIN});
 _SCRIPT.add_body(KERBAL.DUNA, 	{i: 0.06, 	W: 135.5, 	e: 0.051, 	a: 20726155.264, 	w: 0,	v: 3.14,	body: KERBAL.KERBOL});
 _SCRIPT.add_body(KERBAL.IKE, 	{i: 0.2, 	W: 0, 		e: 0.03, 	a: 3200, 			w: 0,	v: 1.7, 	body: KERBAL.DUNA});
-_SCRIPT.add_body(KERBAL.DRES, 	{i: 5, 		W: 280, 	e: 0.145, 	a: 40839348203, 	w: 90,	v: 3.14,	body: KERBAL.KERBOL});
+_SCRIPT.add_body(KERBAL.DRES, 	{i: 5, 		W: 280, 	e: 0.145, 	a: 40839348.203, 	w: 90,	v: 3.14,	body: KERBAL.KERBOL});
 _SCRIPT.add_body(KERBAL.JOOL, 	{i: 1.304, 	W: 52, 		e: 0.05, 	a: 68773560.320, 	w: 0,	v: 0.1, 	body: KERBAL.KERBOL});
 _SCRIPT.add_body(KERBAL.LAYTHE, {i: 0,		W: 0, 		e: 0, 		a: 27184, 			w: 0,	v: 3.14,	body: KERBAL.JOOL});
 _SCRIPT.add_body(KERBAL.VALL, 	{i: 0, 		W: 0, 		e: 0, 		a: 43152, 			w: 0,	v: 0.9, 	body: KERBAL.JOOL});
