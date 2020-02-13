@@ -33,6 +33,7 @@ class Script {
 		this.name = name;
 		this.list_bodies = [];
 		this.sort_list = [];
+		this.bodyByDepth 	= [];
 		
 		// Options
 		if (options === undefined) {
@@ -158,6 +159,7 @@ class Script {
 		}
 		for (var i = 0 ; i < this.list_bodies.length ; i++) {
 			this.sort_list.push(this.list_bodies[i]);
+			this.bodyByDepth.push(this.list_bodies[i]);
 		}
 	}
 	

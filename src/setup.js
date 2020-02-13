@@ -65,7 +65,7 @@ function start() {
 	var SCENARIO 	= _SCENARIO;	//_SOLAR_SYSTEM;
 	SCENARIO.init();
 	LIST_OBJ 		= SCENARIO.list_bodies;
-	LIST_TO_SORT	= SCENARIO.sort_list;
+	LIST_TO_SORT	= SCENARIO.bodyByDepth;
 	
 	// Focus
 	FOCUS.num 		= SCENARIO.list_bodies.indexOf(SCENARIO.focus);
