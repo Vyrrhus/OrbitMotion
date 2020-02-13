@@ -40,7 +40,22 @@ const KERBAL = {
 	TYLO: 			new Body('TYLO', '#F6ECDD', 4.2332127e22,600),
 	BOP: 			new Body('BOP', '#54483F', 3.7261090e19,65),
 	POL: 			new Body('POL', '#ACA57C', 1.0813507e19,44),
-	EELOO: 			new Body('EELOO', '#B5BCB1', 1.1149224e21,210)
+	SARNUS:			new Body('SARNUS', '#9F6654', 1.2299778e24,5300),
+	HALE:			new Body('HALE', '#3E3738', 1.216633e16,6),
+	OVOK:			new Body('OVOK', '#797776', 1.9865795e17,26),
+	EELOO:			new Body('EELOO', '#7F8281', 1.1149224e21,210),
+	SLATE:			new Body('SLATE', '#B29983', 2.9649876e22,540),
+	TEKTO:			new Body('TEKTO', '#3E463F', 2.8834085e21,280),
+	URLUM:			new Body('URLUM', '#59686C', 1.7896959e23,2177),
+	POLTA:			new Body('POLTA', '#729994', 1.3512267e21,220),
+	PRIAX:			new Body('PRIAX', '#353330', 5.0691280e19,74),
+	WAL:			new Body('WAL', '#6F5E33', 7.4427673e21,370),
+	TAL:			new Body('TAL', '#352E23', 3.2002739e18,22),
+	NEIDON:			new Body('NEIDON', '#503887', 2.1228217e23,2145),
+	THATMO:			new Body('THATMO', '#EAEEF5', 2.788363e21,286),
+	NISSEE:			new Body('NISSEE', '#6C6A67', 5.9509224e18,30),
+	PLOCK:			new Body('PLOCK', '#AE8D6D', 7.7680961e20,189),
+	KAREN:			new Body('KAREN', '#7F6F65', 7.0149057e19,85.05)
 };
 
 const CONSTELLATION = {
