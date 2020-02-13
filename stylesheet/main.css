@@ -190,3 +190,75 @@ body {
 	font-style: normal;
 	color: #c88;
 }
+
+/************************************
+*             TREE VIEW             *
+************************************/
+#treeView{
+	position: fixed;
+	left: 20px;
+	bottom: 75px;
+}
+
+#treeView ul{
+	padding: 0px;
+	margin: 0px;
+}
+
+#treeView li{
+	list-style-type: none;
+	color: rgba(202,202,202,0.8);
+	cursor: default;
+}
+
+#tree{
+	max-height: 500px;
+	overflow-y: auto;
+	direction: rtl;
+}
+
+#tree li{
+	margin-left: 3px;
+	border-left: 1px solid rgba(202,202,202,0.8);
+	list-style-type: none;
+	font-weight: 5s00;
+    font-size: 13px;
+	padding-left: 10px;
+}
+
+.unrolled{
+	cursor: pointer !important;
+	font-size: 15px !important;
+	color: rgba(204,136,136,0.8) !important;
+	transition: color 0.2s ease-in-out;
+}
+.rolled{
+	cursor: pointer !important;
+	font-size: 15px !important;
+	color: rgba(136,204,204,0.8) !important;
+	transition: color 0.2s ease-in-out;
+}
+
+.rolled ul{
+	max-height: 0px;
+	overflow-y: scroll;
+	transition: max-height 0.5s ease-in-out;
+}
+
+.unrolled:hover{
+	color: rgba(204,204,136,0.8) !important;
+}
+.rolled:hover{
+	color: rgba(204,136,136,0.8) !important;
+}
+.rolled:hover > ul{
+	max-height: 100px;
+}
+
+::-webkit-scrollbar{
+	width: 0.5em;
+	background-color: rgba(202,202,202,.15)
+}
+::-webkit-scrollbar-thumb{
+	background: rgba(202,202,202,0.8);
+}
