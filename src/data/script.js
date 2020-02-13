@@ -149,7 +149,6 @@ class Script {
 		// Define the DOM arborescence
 		let rootDOM = document.getElementById('treeOrigin');
 		rootDOM.getElementsByTagName('span')[0].innerHTML = sortedList[0].name;
-		rootDOM.id = 'body-' + sortedList[0].name;
 		document.getElementById('tree').remove();
 		let treeDOM = document.createElement('ul');
 		treeDOM.id = 'tree';
