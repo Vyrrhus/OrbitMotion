@@ -214,11 +214,11 @@ body {
 #tree{
 	max-height: 500px;
 	overflow-y: auto;
-	direction: rtl;
 }
 
 #tree li{
 	margin-left: 3px;
+	margin-right: 10px;
 	border-left: 1px solid rgba(202,202,202,0.8);
 	list-style-type: none;
 	font-weight: 5s00;
@@ -232,6 +232,7 @@ body {
 	color: rgba(204,136,136,0.8) !important;
 	transition: color 0.2s ease-in-out;
 }
+
 .rolled{
 	cursor: pointer !important;
 	font-size: 15px !important;
@@ -241,18 +242,44 @@ body {
 
 .rolled ul{
 	max-height: 0px;
-	overflow-y: scroll;
+	overflow-y: hidden;
 	transition: max-height 0.5s ease-in-out;
 }
 
 .unrolled:hover{
 	color: rgba(204,204,136,0.8) !important;
 }
+
 .rolled:hover{
 	color: rgba(204,136,136,0.8) !important;
 }
+
 .rolled:hover > ul{
 	max-height: 100px;
+}
+
+.lockedFocus{
+	position: relative;
+	left: 5px;
+	color: rgba(224,224,96,0.8);
+	pointer-events: none;
+}
+
+.unlockedFocus{
+	position: relative;
+	left: 5px;
+	color: rgb(102,102,102);
+	cursor: pointer;
+	opacity: 0;
+	transition: color 1s ease-in-out;
+}
+
+.unlockedFocus:hover{
+	color: rgba(224,224,96,0.8);
+}
+
+#treeView li:hover > .unlockedFocus{
+	opacity: 0.4;
 }
 
 ::-webkit-scrollbar{

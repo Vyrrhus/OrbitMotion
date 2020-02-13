@@ -9,7 +9,6 @@ const helpSlideTime     = 250;
 var lockedScenario	= document.getElementById('sat_demo');
 
 // FUNCTIONS
-
 function clamp(a,b,c){ 
     return ( (a<b) ? b : ( (a>c) ? c : a) ) 
 }
@@ -67,6 +66,15 @@ function showHelp() {
 function hideHelp() {
     fadeOut(helpMod,     0,  200);
     fadeOut(helpMod.previousElementSibling,    0,  500);
+}
+
+function toggleRoll(el) {
+	el.classList.toggle('rolled');
+	el.classList.toggle('unrolled');
+}
+
+function setFocusOn(el) {
+	FOCUS.setFocusByName(el.previousElementSibling.innerHTML);
 }
 
 function loadScenario(el) {

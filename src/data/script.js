@@ -121,6 +121,7 @@ class Script {
 		let sortedList = this.list_bodies.sort(function(a,b) {
 			return (b.mass - a.mass)
 		});
+		this.bodyByRadius.push(sortedList[0]);
 		console.log(`${this.name} - central body : ${sortedList[0].name}`);
 		
 		// Define the arborescence of orbits
@@ -147,14 +148,22 @@ class Script {
 		}
 		
 		// Define the DOM arborescence
-		let rootDOM = document.getElementById('treeOrigin');
-		rootDOM.getElementsByTagName('span')[0].innerHTML = sortedList[0].name;
 		document.getElementById('tree').remove();
-		let treeDOM = document.createElement('ul');
-		treeDOM.id = 'tree';
+		document.getElementById('focusOrigin').remove();
+		let rootDOM 	= document.getElementById('treeOrigin');
+		let focusRoot 	= document.createElement('i');
+		let treeDOM 	= document.createElement('ul');
+		rootDOM.getElementsByTagName('span')[0].innerHTML = sortedList[0].name;
+		focusRoot.setAttribute('class', 'fas fa-eye unlockedFocus')
+		focusRoot.setAttribute('onclick', 'setFocusOn(this)');
+		focusRoot.id 	= 'focusOrigin';
+		treeDOM.id		= 'tree';
+
+		rootDOM.appendChild(focusRoot);
 		rootDOM.appendChild(treeDOM);
 		
 		let lastParent = [sortedList[0]];
+		
 		while (lastParent.length !== 0) {
 			let nextParent = []
 			
@@ -172,9 +181,14 @@ class Script {
 					// Declare DOM li element and fill it with span & ul if necessary
 					let bodyDOM 		= document.createElement('li');
 					let titleDOM		= document.createElement('span');
-					titleDOM.innerHTML 	= child.name;
+					let focusDOM		= document.createElement('i');
 					bodyDOM.id			= 'body-' + child.name;
+					titleDOM.innerHTML 	= child.name;
+					focusDOM.setAttribute('class', 'fas fa-eye unlockedFocus');
+					focusDOM.setAttribute('onclick', 'setFocusOn(this)');
+					
 					bodyDOM.appendChild(titleDOM);
+					bodyDOM.appendChild(focusDOM);
 					
 					if (child.child.length !== 0) {
 						bodyDOM.appendChild(document.createElement('ul'));
@@ -187,12 +201,16 @@ class Script {
 					if (child.orbit.parent === sortedList[0]) {
 						// Case 1 : Parent is the System main attractor
 						treeDOM.appendChild(bodyDOM);
+						this.bodyByRadius.push(child);
 					} 
 					else {
 						// Case 2 : Parent is another sub-body
 						let parentDOM_name = 'body-' + parent.name;
 						let parentDOM = document.getElementById(parentDOM_name);
 						parentDOM.getElementsByTagName('ul')[0].appendChild(bodyDOM);
+						
+						let parentIndex = this.bodyByRadius.indexOf(parent);
+						this.bodyByRadius.splice(parentIndex+1+j,0,child);
 					}
 				}
 			}

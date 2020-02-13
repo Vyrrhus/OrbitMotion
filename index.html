@@ -6,6 +6,7 @@
 	<link rel="stylesheet" type="text/css" href="./stylesheet/main.css">
     <link href='https://fonts.googleapis.com/css?family=Oswald:400' rel='stylesheet' type='text/css'>
 <!--    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>-->
+	<script src="https://kit.fontawesome.com/ea9585d698.js" crossorigin="anonymous"></script>
     <title>Planetary motion</title>
     <link href = "#" rel="icon">
 </head>
@@ -59,9 +60,10 @@
 	<!--ARBORESCENCE-->
 	<div id="treeView">
 		<ul>
-			<li id="treeOrigin"><span></span>
-				<ul id="tree">
-				</ul>
+			<li id="treeOrigin">
+				<span>KERBOL</span>
+				<i id="focusOrigin" class="fas fa-eye unlockedFocus" onclick="setFocusOn(this)"></i>
+				<ul id="tree"></ul>
 			</li>
 		</ul>
 	</div>

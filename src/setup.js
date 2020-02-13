@@ -68,8 +68,7 @@ function start() {
 	LIST_TO_SORT	= SCENARIO.bodyByDepth;
 	
 	// Focus
-	FOCUS.num 		= SCENARIO.list_bodies.indexOf(SCENARIO.focus);
-	FOCUS.body 		= SCENARIO.focus;
+	FOCUS.setFocusByName(SCENARIO.focus.name)
 	for (var i = 0 ; i < SCENARIO.list_bodies.length ; i++) {
 		SCENARIO.list_bodies[i].sketch.focus = FOCUS.body;
 	}
