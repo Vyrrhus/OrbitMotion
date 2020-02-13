@@ -5,6 +5,8 @@ function resize() {
 	CENTER = {x: Math.floor(WIDTH/2), y: Math.floor(HEIGHT/2)};
 	resizeCanvas(CANVAS);
 	set_background();
+    HUD.drawPlane(CONTEXT.CONTROL);
+    HUD.drawScale(CONTEXT.CONTROL);
 //	set_blackscreen();
 
 	function resizeCanvas(canvas) {
@@ -58,7 +60,7 @@ document.addEventListener('wheel', function(event) {
 		if (PAUSE) {
 			draw_body();
 		}
-	SCALE.draw(CONTEXT.CONTROL);
+	HUD.drawScale(CONTEXT.CONTROL);
 });
 
 // KEYUP EVENT
@@ -183,7 +185,7 @@ document.addEventListener('keypress', function(event) {
 		}
 		
 		// Redraw
-		PLANE.draw(CONTEXT.CONTROL);
+        HUD.drawPlane(CONTEXT.CONTROL);
 	}
 });
 

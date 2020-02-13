@@ -77,18 +77,18 @@ function start() {
 	
 	// Scale
 	SCALE.value 	= SCENARIO.scale;
-	SCALE.draw(CONTEXT.CONTROL);
+	HUD.drawScale(CONTEXT.CONTROL);
 	
 	// Time
 	TIME.date 		= SCENARIO.epoch;
 	TIME.dT			= SCENARIO.dT;
-	TIME.draw_date(CONTEXT.CONTROL);
+	HUD.drawTime(CONTEXT.CONTROL);
 	
 	// Plane
 	PLANE.x			= SCENARIO.plane.x;
 	PLANE.y			= SCENARIO.plane.y;
 	PLANE.z 		= vect3.cross(PLANE.x, PLANE.y);
-	PLANE.draw(CONTEXT.CONTROL);
+    HUD.drawPlane(CONTEXT.CONTROL);
 	
 	// Draw sketch
 	draw_body();
@@ -111,7 +111,7 @@ function run() {
 		LIST_OBJ[i].kepler_motion2(TIME.dT);
 	}
 	TIME.set_date();
-	TIME.draw_date(CONTEXT.CONTROL);
+	HUD.drawTime(CONTEXT.CONTROL);
 }
 
 function draw_body() {
