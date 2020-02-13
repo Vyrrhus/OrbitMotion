@@ -163,18 +163,23 @@ class Script {
 	
 	// Static methods
 	static load(name, callback) {
-		var head = document.head;
-		var script = document.createElement('script');
-		script.type = 'text/javascript';
-		script.src = `src/data/scripts/${name}.js`;
+		let scriptDOM = document.getElementById('scenario-script');
+		if (scriptDOM instanceof Element) {
+			scriptDOM.remove();
+		}
 		
-		script.onload = function() {
+		scriptDOM		= document.createElement('script');
+		scriptDOM.id	= 'scenario-script';
+		scriptDOM.type	= 'text/javascript';
+		scriptDOM.src	= `src/data/scripts/${name}.js`;
+		
+		scriptDOM.onload = function() {
 			_SCENARIO = _SCRIPT;
 			callback();
 		};
-		script.onerror = function() {
+		scriptDOM.onerror = function() {
 			console.log('Something wrong happened while loading script.');
 		}
-		head.appendChild(script);
+		document.head.appendChild(scriptDOM);
 	}
 }
