@@ -9,6 +9,7 @@
 	<link rel="stylesheet" type="text/css" href="./stylesheet/main.css">
     <link href='https://fonts.googleapis.com/css?family=Oswald:400' rel='stylesheet' type='text/css'>
 <!--    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>-->
+	<script src="https://kit.fontawesome.com/ea9585d698.js" crossorigin="anonymous"></script>
     <title>Planetary motion</title>
     <link href = "#" rel="icon">
 </head>
@@ -21,39 +22,54 @@
 	<canvas id="control"></canvas>
     
 <!--UI BUTTONS-->
+	<div class="navContainer">
     
     <!--SCENARIOS-->
-    
     <div id="scenarioButt" class="butt"> SCENARIOS
-        <ul id="list">
-            <li id="constellation"  class="butt" onclick="loadScenario('constellation')">   CONSTELLATION</li>
-            <li id="solarsystem"    class="butt" onclick="loadScenario('solar_system')">    SOLAR SYSTEM</li>
-            <li id="kerbolsystem"   class="butt" onclick="loadScenario('kerbol_system')">   KERBOL SYSTEM</li>
-            <li id="joolsystem"     class="butt" onclick="loadScenario('jool_system')">        JOOL SYSTEM</li>
-            <li id="demosats"       class="butt" onclick="loadScenario('sat_demo')">    DEMO SATS</li>
+        <ul id="scenarioList">
+            <li id="constellation"  class="butt" onclick="loadScenario(this)">   CONSTELLATION </li>
+            <li id="solar_system"    class="butt" onclick="loadScenario(this)">    SOLAR SYSTEM</li>
+            <li id="kerbol_system"   class="butt" onclick="loadScenario(this)">   KERBOL SYSTEM</li>
+            <li id="jool_system"     class="butt" onclick="loadScenario(this)">        JOOL SYSTEM</li>
+            <li id="sat_demo"       class="butt butt-locked" onclick="loadScenario(this)">    DEMO SATS</li>
         </ul>
     </div>
-    
-    <!--  HELP BUTTON  -->
-    
-    <div id="helpButt" class="butt" onclick="showHelp()"> HELP ME PLEASE</div>
-    <div id="helpContent">
-        <div id="helpBackground" onclick="hideHelp()"></div>
-        <div id="helpInner" class="centered">
-            <div id="help" class="centered">
-                <h2>WHAT IS THIS ?</h2>
+		
+	<!--HELP BUTTON-->
+	<div id="helpButt" class="butt" onclick="showHelp()"> HELP ME </div>
+	<div id="helpContent">
+		<div class="helpBackground" onclick="hideHelp()"></div>
+		<div id="helpMod" class="centered">
+			<div id="help" class="centered">
+				<h2>WHAT IS THIS ?</h2>
                 <p>This is a simulation of celestial bodies with a Keplerian motion. Watch a (small) mega-constellation orbiting Earth, discover the wonders of the Jovian system with its various moons, explore the Solar System as a whole or even other stellar systems beyond imagination! </p>
-                <p>It's also a work in progress :)</p>
+                <p>Code development is underway to provide both a user-friendly UI and an efficient physics engine to compute all the data needed.</p>
                 
                 <h2>SO HOW DO I...</h2>
-                <p>Get started with the current <em>SCENARIO</em> or else, choose or create one. You might want to have a look on the simulation's <em>SETTINGS</em> before running it. Then, simply click or press SPACE.</p>
-                <p>You can use + and - keys to control time, Z/S, Q/D and A/E to move the camera around, P and O to switch modes.</p>
-                <p> Toggle [ and ] to switch the origin body (with all motion relative to it)</p>
+                <p>Get started with the current <em>SCENARIO</em> or else, choose or create one (WIP). You might want to have a look on the simulation's <em>SETTINGS</em> before starting (WIP).</p>
+                <p>You can use <em>+</em> and <em>-</em> keys to control time, <em>Z/S</em>, <em>Q/D</em> and <em>A/E</em> to move the camera around, <em>P</em> to show/hide bodies' SOI</p>
+                <p> Toggle <em>[</em> and <em>]</em> to switch the origin body (with all motion relative to it)</p>
+				
+				<h2>WHAT ELSE CAN I DO ?</h2>
+				<p>For now that's quite all. The tool will later provide the ability to compute and execute maneuvers, instantaneous or continuous from an orbit to another. It could also provide a n-body simulation of a short trajectory so that the inaccuracy of Keplerian motion can be assessed. Orbital decay simulation using atmospheric drag would also be a big feature to implement.</p>
                 
-                <h2>WHO CAN I THANK FOR THAT?</h2>
-                <p>I'm the one. Please go and visit my <a href="https://www.twitter.com/vyrrhus">Twitter</a>.</p>
-            </div>
-        </div>
+                <h2>WHO SHALL I THANK?</h2>
+                <p>Thank YOU for visiting this website. You can contribute there: <a href='https://github.com/Vyrrhus/OrbitMotion'>source code</a>.</p>
+				<p>Also, please come and visit my <a href="https://www.twitter.com/vyrrhus">Twitter</a> account. See you there!</p>
+			</div>
+		</div>
+	</div>
+		
+	<!--ARBORESCENCE-->
+	<div id="treeView">
+		<ul>
+			<li id="treeOrigin">
+				<span>KERBOL</span>
+				<i id="focusOrigin" class="fas fa-eye unlockedFocus" onclick="setFocusOn(this)"></i>
+				<ul id="tree"></ul>
+			</li>
+		</ul>
+	</div>
     </div>
 	
 <!--JAVASCRIPT SOURCES-->

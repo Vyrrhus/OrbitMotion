@@ -5,6 +5,8 @@ function resize() {
 	CENTER = {x: Math.floor(WIDTH/2), y: Math.floor(HEIGHT/2)};
 	resizeCanvas(CANVAS);
 	set_background();
+    HUD.drawPlane(CONTEXT.CONTROL);
+    HUD.drawScale(CONTEXT.CONTROL);
 //	set_blackscreen();
 
 	function resizeCanvas(canvas) {
@@ -58,7 +60,7 @@ document.addEventListener('wheel', function(event) {
 		if (PAUSE) {
 			draw_body();
 		}
-	SCALE.draw(CONTEXT.CONTROL);
+	HUD.drawScale(CONTEXT.CONTROL);
 });
 
 // KEYUP EVENT
@@ -110,21 +112,16 @@ document.addEventListener('keypress', function(event) {
 		if (event.key === '(') {
 			sign *= -1;
 		}
-		FOCUS.num += sign;
-		if (FOCUS.num < 0) {
-			FOCUS.num = LIST_OBJ.length-1;
+		let focusNum = FOCUS.num + sign;
+		
+		if (focusNum < 0) {
+			focusNum = LIST_OBJ.length-1;
 		}
-		if (FOCUS.num > LIST_OBJ.length-1) {
-			FOCUS.num = 0;
+		if (focusNum > LIST_OBJ.length-1) {
+			focusNum = 0;
 		}
-		FOCUS.body = LIST_OBJ[FOCUS.num];
-//		CONTEXT.TRAJECTORY.clearRect(0,0,WIDTH,HEIGHT);
-		for (var i = 0 ; i < LIST_OBJ.length ; i++) {
-			LIST_OBJ[i].sketch.focus = FOCUS.body;
-//			LIST_OBJ[i].sketch.reset_store();
-//			LIST_OBJ[i].sketch.draw_stored_position(CONTEXT.TRAJECTORY, CENTER, SCALE.value, SCALE.unit, FOCUS.body, PLANE);	
-		}
-		console.log(`FOCUS set on : ${FOCUS.body.name}`)
+		FOCUS.setFocusByNum(focusNum);
+		
 		if (PAUSE) {
 			draw_body();
 		}
@@ -183,7 +180,7 @@ document.addEventListener('keypress', function(event) {
 		}
 		
 		// Redraw
-		PLANE.draw(CONTEXT.CONTROL);
+        HUD.drawPlane(CONTEXT.CONTROL);
 	}
 });
 

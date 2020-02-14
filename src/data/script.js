@@ -31,8 +31,9 @@ class Script {
 			plane:	{x, y} projection plane
 		*/
 		this.name = name;
-		this.list_bodies = [];
-		this.sort_list = [];
+		this.list_bodies 	= [];
+		this.bodyByDepth 	= [];
+		this.bodyByRadius	= [];
 		
 		// Options
 		if (options === undefined) {
@@ -115,66 +116,136 @@ class Script {
 		}
 		console.log(`Something wrong happened for ${body.name} while getting added to the script ${this.name}`);
 	}
-	set_kepler() {
-		var list_bodies = this.list_bodies;
-		
+	sort_script() {
 		// Sort by mass
-		list_bodies.sort(function(a,b) {
+		let sortedList = this.list_bodies.sort(function(a,b) {
 			return (b.mass - a.mass)
 		});
-		console.log(`${this.name} - central body : ${list_bodies[0].name}`);
+		this.bodyByRadius.push(sortedList[0]);
+		console.log(`${this.name} - central body : ${sortedList[0].name}`);
 		
-		// Iterate
-		for (let i = 1 ; i < list_bodies.length ; i++) {
-			console.log(`${this.name} - add ${list_bodies[i].name}`);
-//            console.log(list_bodies[i].state)
-			var reference = this.list_bodies[0];
-			for (var j = i - 1; j > 0 ; j--) {
-				var distance = Body.get_distance(list_bodies[i], list_bodies[j]);
-				var SOI = list_bodies[j].SOI;
+		// Define the arborescence of orbits
+		for (let i = 1 ; i < sortedList.length ; i++) {
+			console.log(`${this.name} - add ${sortedList[i].name}`);
+			let reference = this.list_bodies[0];
+			for (let j = i - 1; j > 0 ; j--) {
+				let distance = Body.get_distance(sortedList[i], sortedList[j]);
+				let SOI = sortedList[j].SOI;
 				if (distance < SOI) {
 					// Reference found
-					reference = list_bodies[j];
+					reference = sortedList[j];
 					j = 0;
 				}
 			}
 			
-			// Add child to reference
-			reference.child.push(list_bodies[i]);
+			// Add child to body-reference
+			reference.child.push(sortedList[i]);
 			
 			// Set relative state vectors
-//			var relative_state = list_bodies[i].state.get_relative(reference);
-			var relative_state = State.relative(list_bodies[i].state, reference.state);
-//			var relative_state = stateVector.get_relative(list_bodies[i].state, reference.state);
-//			list_bodies[i].state = new stateVector(relative_state, reference);
-			list_bodies[i].state = relative_state;
-			list_bodies[i].get_orbit(list_bodies[i].state.reference);
+			let relative_state = State.relative(sortedList[i].state, reference.state);
+			sortedList[i].state = relative_state;
+			sortedList[i].get_orbit(sortedList[i].state.reference);
+		}
+		
+		// Define the DOM arborescence
+		document.getElementById('tree').remove();
+		document.getElementById('focusOrigin').remove();
+		let rootDOM 	= document.getElementById('treeOrigin');
+		let focusRoot 	= document.createElement('i');
+		let treeDOM 	= document.createElement('ul');
+		rootDOM.getElementsByTagName('span')[0].innerHTML = sortedList[0].name;
+		focusRoot.setAttribute('class', 'fas fa-eye unlockedFocus')
+		focusRoot.setAttribute('onclick', 'setFocusOn(this)');
+		focusRoot.id 	= 'focusOrigin';
+		treeDOM.id		= 'tree';
+
+		rootDOM.appendChild(focusRoot);
+		rootDOM.appendChild(treeDOM);
+		
+		let lastParent = [sortedList[0]];
+		
+		while (lastParent.length !== 0) {
+			let nextParent = []
+			
+			// Iterate through parent-body (ie: Kerbol)
+			for (let i = 0 ; i < lastParent.length ; i++) {
+				let parent = lastParent[i];
+				let childSorted = parent.child.sort(function(a,b) {
+					return (a.orbit.a - b.orbit.a)
+				});
+				
+				// Iterate through parent's childs (ie: Moho, Eve, Kerbin...)
+				for (let j = 0 ; j < childSorted.length ; j++) {
+					let child = childSorted[j];
+					
+					// Declare DOM li element and fill it with span & ul if necessary
+					let bodyDOM 		= document.createElement('li');
+					let titleDOM		= document.createElement('span');
+					let focusDOM		= document.createElement('i');
+					bodyDOM.id			= 'body-' + child.name;
+					titleDOM.innerHTML 	= child.name;
+					focusDOM.setAttribute('class', 'fas fa-eye unlockedFocus');
+					focusDOM.setAttribute('onclick', 'setFocusOn(this)');
+					
+					bodyDOM.appendChild(titleDOM);
+					bodyDOM.appendChild(focusDOM);
+					
+					if (child.child.length !== 0) {
+						bodyDOM.appendChild(document.createElement('ul'));
+						bodyDOM.classList.toggle('rolled');
+						bodyDOM.setAttribute('onclick', 'toggleRoll(this)');
+						nextParent.push(child);
+					}
+					
+					// Put DOM element in the right place
+					if (child.orbit.parent === sortedList[0]) {
+						// Case 1 : Parent is the System main attractor
+						treeDOM.appendChild(bodyDOM);
+						this.bodyByRadius.push(child);
+					} 
+					else {
+						// Case 2 : Parent is another sub-body
+						let parentDOM_name = 'body-' + parent.name;
+						let parentDOM = document.getElementById(parentDOM_name);
+						parentDOM.getElementsByTagName('ul')[0].appendChild(bodyDOM);
+						
+						let parentIndex = this.bodyByRadius.indexOf(parent);
+						this.bodyByRadius.splice(parentIndex+1+j,0,child);
+					}
+				}
+			}
+			lastParent = nextParent;
 		}
 	}
 	init() {
-		this.set_kepler();
+		this.sort_script();
 		if (!this.list_bodies.includes(this.focus)) {
 			this.focus = this.list_bodies[0];
 		}
 		for (var i = 0 ; i < this.list_bodies.length ; i++) {
-			this.sort_list.push(this.list_bodies[i]);
+			this.bodyByDepth.push(this.list_bodies[i]);
 		}
 	}
 	
 	// Static methods
 	static load(name, callback) {
-		var head = document.head;
-		var script = document.createElement('script');
-		script.type = 'text/javascript';
-		script.src = `src/data/scripts/${name}.js`;
+		let scriptDOM = document.getElementById('scenario-script');
+		if (scriptDOM instanceof Element) {
+			scriptDOM.remove();
+		}
 		
-		script.onload = function() {
+		scriptDOM		= document.createElement('script');
+		scriptDOM.id	= 'scenario-script';
+		scriptDOM.type	= 'text/javascript';
+		scriptDOM.src	= `src/data/scripts/${name}.js`;
+		
+		scriptDOM.onload = function() {
 			_SCENARIO = _SCRIPT;
 			callback();
 		};
-		script.onerror = function() {
+		scriptDOM.onerror = function() {
 			console.log('Something wrong happened while loading script.');
 		}
-		head.appendChild(script);
+		document.head.appendChild(scriptDOM);
 	}
 }

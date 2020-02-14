@@ -4,14 +4,33 @@ var PLANE = {
 	y: J,
 	z: K,
 	lock: false,
-	draw: function(ctx) {
-		ctx.clearRect(0,HEIGHT-230,230,230);
-		I.draw(ctx, this, {type: 'vec', text: 'I', center: {x: 100, y: HEIGHT-100}});
-		J.draw(ctx, this, {type: 'vec', text: 'J', center: {x: 100, y: HEIGHT-100}});
-		K.draw(ctx, this, {type: 'vec', text: 'K', center: {x: 100, y: HEIGHT-100}});
-//		X.draw(ctx, this, {type: 'vec', text: 'X', center: {x: 100, y: HEIGHT-100}});
-//		Y.draw(ctx, this, {type: 'vec', text: 'Y', center: {x: 100, y: HEIGHT-100}});
-//		U.draw(ctx, this, {type: 'vec', text: 'U', center: {x: 100, y: HEIGHT-100}});
-//		V.draw(ctx, this, {type: 'vec', text: 'V', center: {x: 100, y: HEIGHT-100}});
-	}
+    dimensions: {
+        paddingBottom: 0.15,
+        marginHeight: 0.05,
+    },
+    showBox: false,
+    draw: function(ctx, x0, y0, w0, h0) {
+        /* DRAW ORIENTATION VECTORS */
+        // DIMENSIONS
+        let height = h0 * (1 - this.dimensions.paddingBottom) / 2;
+        let planeX = x0 + w0 / 2;
+        let planeY = y0 + height;
+        let length = Math.min(w0 / 2, height);
+        
+        ctx.clearRect(planeX - length, planeY - length, 2*length, 2*length);
+        
+        // SHOW PLANE BOX
+        if (this.showBox) {
+            ctx.beginPath();
+            ctx.rect(planeX - length, planeY - length, 2*length, 2*length);
+            ctx.fillStyle = "rgba(0,0,255,0.4)";
+            ctx.fill();
+            ctx.closePath();
+        }
+        
+        // DRAW VECTORS
+        I.draw(ctx, this, {type: 'vec', text: 'I', length: length*0.75, center: {x: planeX, y: planeY}});
+        J.draw(ctx, this, {type: 'vec', text: 'J', length: length*0.75, center: {x: planeX, y: planeY}});
+        K.draw(ctx, this, {type: 'vec', text: 'K', length: length*0.75, center: {x: planeX, y: planeY}});
+    }
 };

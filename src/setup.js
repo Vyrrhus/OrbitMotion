@@ -65,11 +65,10 @@ function start() {
 	var SCENARIO 	= _SCENARIO;	//_SOLAR_SYSTEM;
 	SCENARIO.init();
 	LIST_OBJ 		= SCENARIO.list_bodies;
-	LIST_TO_SORT	= SCENARIO.sort_list;
+	LIST_TO_SORT	= SCENARIO.bodyByDepth;
 	
 	// Focus
-	FOCUS.num 		= SCENARIO.list_bodies.indexOf(SCENARIO.focus);
-	FOCUS.body 		= SCENARIO.focus;
+	FOCUS.setFocusByName(SCENARIO.focus.name)
 	for (var i = 0 ; i < SCENARIO.list_bodies.length ; i++) {
 		SCENARIO.list_bodies[i].sketch.focus = FOCUS.body;
 	}
@@ -77,18 +76,18 @@ function start() {
 	
 	// Scale
 	SCALE.value 	= SCENARIO.scale;
-	SCALE.draw(CONTEXT.CONTROL);
+	HUD.drawScale(CONTEXT.CONTROL);
 	
 	// Time
 	TIME.date 		= SCENARIO.epoch;
 	TIME.dT			= SCENARIO.dT;
-	TIME.draw_date(CONTEXT.CONTROL);
+	HUD.drawTime(CONTEXT.CONTROL);
 	
 	// Plane
 	PLANE.x			= SCENARIO.plane.x;
 	PLANE.y			= SCENARIO.plane.y;
 	PLANE.z 		= vect3.cross(PLANE.x, PLANE.y);
-	PLANE.draw(CONTEXT.CONTROL);
+    HUD.drawPlane(CONTEXT.CONTROL);
 	
 	// Draw sketch
 	draw_body();
@@ -111,7 +110,7 @@ function run() {
 		LIST_OBJ[i].kepler_motion2(TIME.dT);
 	}
 	TIME.set_date();
-	TIME.draw_date(CONTEXT.CONTROL);
+	HUD.drawTime(CONTEXT.CONTROL);
 }
 
 function draw_body() {
