@@ -42,5 +42,11 @@ var SCALE = {
 		ctx.textBaseline 	= 'bottom';
 		ctx.textAlign		= 'center';
 		ctx.fillText(text, x0-scaleWidth/2,y0);
-    }
+    },
+	zoom: function(delta) {
+		this.value *= (1 + Math.sign(delta) * 0.05);
+		if (this.value < 1) {
+			this.value = 1;
+		}
+	}
 };

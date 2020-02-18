@@ -52,15 +52,7 @@ window.onload = function() {
 
 // WHEEL EVENT
 document.addEventListener('wheel', function(event) {
-	if (!HUD.zoom) {return}
-	SCALE.value *= (1 + Math.sign(event.deltaY) * 5/100);
-	if (SCALE.value < 1) {SCALE.value =1}
-	
-	// Clear and redraw bodies
-		if (PAUSE) {
-			draw_body();
-		}
-	HUD.drawScale(CONTEXT.CONTROL);
+	HUD.zoom(CONTEXT.CONTROL, event.deltaY);
 });
 
 // KEYUP EVENT

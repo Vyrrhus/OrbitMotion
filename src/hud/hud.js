@@ -53,5 +53,14 @@ const HUD = {
 		this.zoom = true;
 		this.move = true;
 		this.focus = true;
+	},
+	zoom: function(ctx,delta) {
+		if (this.zoom) {
+			SCALE.zoom(delta);
+			if (PAUSE) {
+				draw_body();
+			}
+			this.drawScale(ctx);
+		}
 	}
 }
