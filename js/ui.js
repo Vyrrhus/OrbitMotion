@@ -6,6 +6,8 @@ const helpMarginLeft    = 150;
 const helpSlideDelay    = 50;
 const helpSlideLag      = 150;
 const helpSlideTime     = 250;
+const timeCollapse		= 500;
+const timeCollapseTree	= 1000;
 var lockedScenario	= document.getElementById('sat_demo');
 
 // FUNCTIONS
@@ -38,6 +40,36 @@ function fadeOut(el, t0, dT) {
     }
     
     fade();
+}
+
+function collapseSection(el, dT) {
+	let sectionHeight = el.offsetHeight;
+	let t0 = +new Date();
+	let collapse = function() {
+		let currentHeight = sectionHeight * clamp(1 - (+new Date() - t0) / dT, 0, 1);
+		el.style.height = currentHeight + 'px';
+		if (currentHeight > 0) {
+			(window.requestAnimationFrame && requestAnimationFrame(collapse)) || setTimeout(collapse,16);
+		}
+	}
+	
+	collapse();
+}
+
+function expandSection(el, dT) {
+	let sectionHeight = el.scrollHeight;
+	let t0 = +new Date();
+	let expand = function() {
+		let currentHeight = sectionHeight * clamp((+new Date() - t0) / dT, 0, 1);
+		el.style.height = currentHeight + 'px';
+		if (currentHeight < sectionHeight) {
+			(window.requestAnimationFrame && requestAnimationFrame(expand)) || setTimeout(expand,16);
+		} else {
+			el.style.height = "";
+		}
+	}
+	
+	expand();
 }
 
 function slideLeft(el, t0, dT, margin_0, margin_1) {
