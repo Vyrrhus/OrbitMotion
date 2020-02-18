@@ -32,10 +32,10 @@ var FOCUS = {
 			this.focusDOM.classList.toggle('lockedFocus');
 		}
 		if (this.num === 0) {
-			this.focusDOM = document.getElementById('treeOrigin').firstElementChild.nextElementSibling;
+			this.focusDOM = document.getElementById('focusOrigin');
 		} else {
 			let title = 'body-' + this.body.name;
-			this.focusDOM = document.getElementById(title).firstElementChild.nextElementSibling;
+			this.focusDOM = document.getElementById(title).getElementsByTagName('i')[0];
 		}
 		this.focusDOM.classList.toggle('unlockedFocus');
 		this.focusDOM.classList.toggle('lockedFocus');
