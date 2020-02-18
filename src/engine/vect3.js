@@ -97,9 +97,23 @@ class vect3 {
 			ctx.fillStyle = options.color;
 			ctx.textAlign = "center";
 			ctx.textBaseline = "middle";
-			ctx.fillText(options.text, 
-					 	screen_origine.x + screen_vect.x * (this.length + 15),
-					 	screen_origine.y + screen_vect.y * (this.length + 15))
+			if (options.base === undefined) {
+				ctx.fillText(options.text,
+							 screen_origine.x + screen_vect.x * (this.length + 15),
+							 screen_origine.y + screen_vect.y * (this.length + 15));
+			} else {
+				let base = options.base;
+				let length = this.length;
+				let vectText = vect3.add(vect3.scale(length,this),
+										 vect3.scale(0.2*length,base[0]), 
+										 vect3.scale(-0.2*length,base[1]));
+				let screenText = vectText.project(plane);
+				screenText.y *= -1;
+				ctx.fillText(options.text,
+							 screen_origine.x + screenText.x * this.length * 0.9,
+							 screen_origine.y + screenText.y * this.length * 0.9);
+			}
+			
 		}
 	}
 	
