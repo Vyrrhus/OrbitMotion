@@ -148,18 +148,26 @@ class Script {
 		}
 		
 		// Define the DOM arborescence
-		document.getElementById('tree').remove();
-		document.getElementById('focusOrigin').remove();
-		let rootDOM 	= document.getElementById('treeOrigin');
+		document.getElementById('treeOrigin').remove();
+		let root		= document.getElementById('treeView');
+		let rootDOM		= document.createElement('li');
+		rootDOM.id 		= 'treeOrigin';
+		document.getElementById('treeView').firstElementChild.appendChild(rootDOM);
+		let expandRoot	= document.createElement('i');
+		let titleRoot	= document.createElement('span');
 		let focusRoot 	= document.createElement('i');
 		let treeDOM 	= document.createElement('ul');
-		rootDOM.getElementsByTagName('span')[0].innerHTML = sortedList[0].name;
-		focusRoot.setAttribute('class', 'fas fa-eye unlockedFocus')
+		titleRoot.innerHTML = sortedList[0].name;
+		expandRoot.setAttribute('class', 'fas fa-caret-down');
+		expandRoot.id	= 'expandTree';
+		expandRoot.setAttribute('onclick', 'toggleTree(this)');
+		focusRoot.setAttribute('class', 'fas fa-eye unlockedFocus');
 		focusRoot.setAttribute('onclick', 'setFocusOn(this)');
 		focusRoot.id 	= 'focusOrigin';
 		treeDOM.id		= 'tree';
-
 		rootDOM.appendChild(focusRoot);
+		rootDOM.appendChild(titleRoot);
+		rootDOM.appendChild(expandRoot);
 		rootDOM.appendChild(treeDOM);
 		
 		let lastParent = [sortedList[0]];
@@ -185,16 +193,26 @@ class Script {
 					bodyDOM.id			= 'body-' + child.name;
 					titleDOM.innerHTML 	= child.name;
 					focusDOM.setAttribute('class', 'fas fa-eye unlockedFocus');
-					focusDOM.setAttribute('onclick', 'setFocusOn(this)');
-					
-					bodyDOM.appendChild(titleDOM);
-					bodyDOM.appendChild(focusDOM);
+					focusDOM.onclick = function(event) {
+						setFocusOn(this);
+						event.stopPropagation();
+					}					
 					
 					if (child.child.length !== 0) {
+						titleDOM.onclick = function(event) {
+							toggleRoll(this);
+							event.stopPropagation();
+						}
+						bodyDOM.appendChild(focusDOM);
+						bodyDOM.appendChild(titleDOM);
+						
 						bodyDOM.appendChild(document.createElement('ul'));
-						bodyDOM.classList.toggle('rolled');
-						bodyDOM.setAttribute('onclick', 'toggleRoll(this)');
+						bodyDOM.classList.toggle('parentNode');
+						
 						nextParent.push(child);
+					} else {
+						bodyDOM.appendChild(focusDOM);
+						bodyDOM.appendChild(titleDOM);
 					}
 					
 					// Put DOM element in the right place
