@@ -5,32 +5,25 @@ var PLANE = {
 	z: K,
 	lock: false,
     dimensions: {
-        paddingBottom: 0.15,
-        marginHeight: 0.05,
+		lengthRatio: 1
     },
     showBox: false,
-    draw: function(ctx, x0, y0, w0, h0) {
-        /* DRAW ORIENTATION VECTORS */
-        // DIMENSIONS
-        let height = h0 * (1 - this.dimensions.paddingBottom) / 2;
-        let planeX = x0 + w0 / 2;
-        let planeY = y0 + height;
-        let length = Math.min(w0 / 2, height);
-        
-        ctx.clearRect(planeX - length, planeY - length, 2*length, 2*length);
-        
-        // SHOW PLANE BOX
-        if (this.showBox) {
-            ctx.beginPath();
-            ctx.rect(planeX - length, planeY - length, 2*length, 2*length);
-            ctx.fillStyle = "rgba(0,0,255,0.4)";
-            ctx.fill();
-            ctx.closePath();
-        }
-        
-        // DRAW VECTORS
-        I.draw(ctx, this, {type: 'vec', text: 'I', length: length*0.75, center: {x: planeX, y: planeY}});
-        J.draw(ctx, this, {type: 'vec', text: 'J', length: length*0.75, center: {x: planeX, y: planeY}});
-        K.draw(ctx, this, {type: 'vec', text: 'K', length: length*0.75, center: {x: planeX, y: planeY}});
-    }
+	draw_hud: function(ctx, x0, y0) {
+		/* DRAW HUD ELEMENTS */
+		let length	= this.dimensions.lengthRatio * clamp(SCALE.dimensions.scaleLengthRatio * WIDTH, SCALE.dimensions.scaleMinLength, SCALE.dimensions.scaleMaxLength) / 2;
+		let centerX = x0 - length;
+		let centerY = y0 - length;
+		
+		// Clear
+		ctx.clearRect(centerX - length, centerY - length, 2 * length, 2 * length);
+		
+		// Box
+//		ctx.fillStyle = 'rgba(136,204,136,0.5)';
+//		ctx.fillRect(centerX - length, centerY - length, 2 * length, 2 * length);
+		
+		// Plane
+		I.draw(ctx, this, {type: 'vec', text:'I', length: length, center: {x: centerX, y: centerY}, base:[K,J]});
+		J.draw(ctx, this, {type: 'vec', text:'J', length: length, center: {x: centerX, y: centerY}, base:[I,K]});
+		K.draw(ctx, this, {type: 'vec', text:'K', length: length, center: {x: centerX, y: centerY}, base:[I,J]});
+	}
 };

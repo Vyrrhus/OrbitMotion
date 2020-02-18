@@ -7,11 +7,10 @@ var TIME = {
 	delta: 0,
 	date: new Date(2019,0,1),
     dimensions: {
-        margin: 0.3,
-        height: 0.025,
-        bottom: 0.02
+		textLength: 0,
+		textSize: 15,
+		textFont: 'Arial'
     },
-    showBox: false,
 	tick: function() {
 		var time = new Date().getTime();
 		if (this.LAST_TICK === 0) {
@@ -53,26 +52,25 @@ var TIME = {
 	set_date: function() {
 		this.date = new Date(this.date.getTime() + this.dT*1000);
 	},
-	draw_date: function(ctx, x0, y0, w0, h0) {
-        /* DRAW TIMELINE */
-        // TEXT
-        let text  = this.date.str()
-        
-        // DRAW
-        ctx.clearRect(x0,y0,w0+10,h0);
-        
-        if (this.showBox) {
-            ctx.beginPath();
-            ctx.rect(x0,y0,w0,h0);
-            ctx.fillStyle = "rgba(0,255,255,0.4)";
-            ctx.fill();
-            ctx.closePath();
-        }
-        ctx.font            = '15px Arial';
-        ctx.textBaseline    = 'middle';
-        ctx.textAlign       = 'center'
-        ctx.fillStyle        = "#BBB";
-        ctx.fillText(text, x0 + w0 / 2 + 5, y0 + h0 / 2);
+	draw_hud: function(ctx, x0, y0) {
+        /* DRAW HUD ELEMENT */
+		// Clear
+		ctx.clearRect(x0,y0,this.dimensions.textLength, - this.dimensions.textHeight);
+		
+		// Box
+//		ctx.fillStyle = 'rgba(136,136,204,0.5)'
+//		ctx.fillRect(x0,y0,this.dimensions.textLength, - this.dimensions.textHeight);
+		
+		// Text
+		let text 			= this.date.str();
+		ctx.font 			= this.dimensions.textSize + 'px ' + this.dimensions.textFont;
+		ctx.textBaseline	= 'bottom';
+		ctx.textAlign 		= 'left';
+		ctx.fillStyle		= 'rgba(202,202,202,0.8)';
+		ctx.fillText(text, x0, y0);
+		
+		this.dimensions.textLength = ctx.measureText(text).width;
+		this.dimensions.textHeight = 1.5 * this.dimensions.textSize;
 	},
 	toggle_devMode: function() {
 		this.devMode = !this.devMode;

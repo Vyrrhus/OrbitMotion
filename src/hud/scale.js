@@ -4,52 +4,43 @@ var SCALE = {
 	unit: 'km',
 	lock: false,
     dimensions: {
-        marginWidth: 0.05,
-        paddingBottom: 0.05,
-        scaleHeight: 0.03
+        textLength: 0,
+		textSize: 13,
+		textFont: 'Arial',
+		textHeight: 20,
+		scaleLengthRatio: 0.25,
+		scaleMinLength: 100,
+		scaleMaxLength: 200,
+		scaleHeightRatio: 0.05
     },
-    showBox: false,
-    draw: function(ctx, x0, y0, w0, h0) {
-        /*  DRAW SIMULATION SCALE */
-        // DIMENSIONS
-        let scaleX = x0 + w0 * this.dimensions.marginWidth;
-        let scaleY = y0 + h0 * (1 - this.dimensions.paddingBottom - 2 * this.dimensions.scaleHeight)
-        
-        let scaleW = w0 * (1 - 2 * this.dimensions.marginWidth)
-        let scaleH = h0 * this.dimensions.scaleHeight * 2;
-        
-        ctx.clearRect(scaleX, scaleY - 10, scaleW, scaleH + 10);
-        
-        // SHOW SCALE BOX
-        if (this.showBox) {
-            ctx.beginPath();
-            ctx.rect(x0,y0,w0,h0);
-            ctx.fillStyle = "rgba(255,0,0,0.4)";
-            ctx.fill();
-            ctx.closePath();
-            
-            ctx.beginPath();
-            ctx.rect(scaleX, scaleY, scaleW, scaleH);
-            ctx.fillStyle = "rgba(0,255,0,0.4)";
-            ctx.fill();
-            ctx.closePath();
-        }
-        
-        // DRAW SCALE
-        ctx.beginPath();
-        ctx.rect(scaleX, scaleY + scaleH / 2, scaleW, 1);
-        ctx.rect(scaleX, scaleY, 1, scaleH);
-        ctx.rect(scaleX + scaleW, scaleY, 1, scaleH);
-        ctx.fillStyle = "#BBB";
-        ctx.fill();
-        ctx.closePath();
-        
-        // DRAW TEXT
-        ctx.font = '13px Arial';
-        let value = this.value * scaleW;
-        let text = value.toExponential(3) + ' ' + this.unit;
-        ctx.textBaseline = 'bottom';
-        ctx.textAlign = 'center';
-        ctx.fillText(text, scaleX + scaleW / 2, scaleY + scaleH / 2)
+    draw_hud: function(ctx, x0, y0) {
+        /*  DRAW HUD ELEMENT */
+		let scaleWidth 	= clamp(this.dimensions.scaleLengthRatio * WIDTH,
+								this.dimensions.scaleMinLength,
+								this.dimensions.scaleMaxLength);
+		let scaleHeight	= this.dimensions.scaleHeightRatio * scaleWidth;
+		let value		= this.value * scaleWidth;
+		let text		= value.toExponential(3) + ' ' + this.unit;
+		
+		// Clear
+		ctx.clearRect(x0-scaleWidth,y0-this.dimensions.textHeight,scaleWidth,this.dimensions.textHeight);
+		
+		// Box
+//		ctx.fillStyle = 'rgba(136,136,204,0.5)';
+//		ctx.fillRect(x0-scaleWidth,y0-this.dimensions.textHeight,scaleWidth,this.dimensions.textHeight);
+		
+		// Scale & Text
+		ctx.beginPath();
+		ctx.rect(x0,y0,-scaleWidth,1);
+		ctx.rect(x0,y0,-1,-scaleHeight);
+		ctx.rect(x0-scaleWidth,y0,1,-scaleHeight);
+		ctx.fillStyle = 'rgba(202,202,202,0.8)';
+		ctx.fill();
+		ctx.closePath();
+		
+		ctx.font 			= this.dimensions.textSize + 'px ' + this.dimensions.textFont;
+		ctx.textBaseline 	= 'bottom';
+		ctx.textAlign		= 'center';
+		ctx.fillText(text, x0-scaleWidth/2,y0);
     }
 };

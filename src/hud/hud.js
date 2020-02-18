@@ -26,37 +26,23 @@ const HUD = {
 	move: true,
 	focus: true,
     dimensions: {
-        compassWidth: 0.3,
-        compassHeight: 0.3,
-        compassX: 0.3,
-        compassY: 0.3,
-        timeWidth: 0.2,
-        timeHeight: 0.05,
-        timeX: 0,
-        timeY: 0.95
+		bottomLine: 15,
+		widthMargin: 10
     },
     drawScale: function(ctx) {
-        let ratio = Math.min(WIDTH, HEIGHT);
-        let x0 = WIDTH  - ratio * this.dimensions.compassX;
-        let y0 = HEIGHT - ratio * this.dimensions.compassY;
-        let w0 = ratio * this.dimensions.compassWidth;
-        let h0 = ratio * this.dimensions.compassHeight;
-        SCALE.draw(ctx, x0, y0, w0, h0);
+		let x0 = WIDTH - this.dimensions.widthMargin;
+		let y0 = HEIGHT - this.dimensions.bottomLine;
+		SCALE.draw_hud(ctx, x0, y0);
     },
     drawPlane: function(ctx) {
-        let ratio = Math.min(WIDTH, HEIGHT);
-        let x0 = WIDTH  - ratio * this.dimensions.compassX;
-        let y0 = HEIGHT - ratio * this.dimensions.compassY;
-        let w0 = ratio * this.dimensions.compassWidth;
-        let h0 = ratio * this.dimensions.compassHeight;
-        PLANE.draw(ctx, x0, y0, w0, h0);
+		let x0 = WIDTH - this.dimensions.widthMargin;
+		let y0 = HEIGHT - this.dimensions.bottomLine - SCALE.dimensions.textHeight;
+		PLANE.draw_hud(ctx, x0, y0);
     },
     drawTime: function(ctx) {
-		let x0 = WIDTH * this.dimensions.timeX;
-		let y0 = HEIGHT * this.dimensions.timeY;
-		let w0 = WIDTH * this.dimensions.timeWidth;
-		let h0 = HEIGHT * this.dimensions.timeHeight;
-        TIME.draw_date(ctx,x0,y0,w0,h0);
+		let x0 = this.dimensions.widthMargin;
+		let y0 = HEIGHT - this.dimensions.bottomLine;
+		TIME.draw_hud(ctx, x0, y0)
     },
 	lock: function() {
 		this.zoom = false;
