@@ -93,7 +93,7 @@ class vect3 {
 		
 		// Text
 		if (options.text !== undefined) {
-			ctx.font = "13px Arial";
+			ctx.font = "11px Arial";
 			ctx.fillStyle = options.color;
 			ctx.textAlign = "center";
 			ctx.textBaseline = "middle";
