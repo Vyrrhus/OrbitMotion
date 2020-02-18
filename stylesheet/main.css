@@ -142,9 +142,11 @@ body {
 
 #helpMod{
 	position: fixed;
+	overflow-y: scroll;
 	z-index: 111;
 	width: 80%;
 	max-width: 460px;
+	max-height: 700px;
 	background-color: rgba(0,10,15,1);
 	font-size: 14px;
 	text-align: justify;
