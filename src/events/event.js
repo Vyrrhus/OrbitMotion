@@ -183,3 +183,61 @@ document.addEventListener('click', function(event) {
 	}
 	console.log(`x:${event.clientX} ; y:${event.clientY}`);
 })
+
+// TOUCH EVENTS (mobile purpose)
+
+var TouchEvent = {
+	evCache: new Array(),
+	prevDiff: -1,
+	init: function() {
+		document.onpointerdown		= this.pointerdown_handler;
+		document.onpointermove		= this.pointermove_handler;
+		document.onpointerup		= this.pointerup_handler;
+		document.onpointercancel	= this.pointerup_handler;
+		document.onpointerout		= this.pointerup_handler;
+		document.onpointerleave		= this.pointerup_handler;
+	},
+	pointerdown_handler: function(ev) {
+		this.evCache.push(ev);
+	},
+	pointerup_handler: function(ev) {
+		for (let i = 0 ; i < this.evCache.length ; i++) {
+			if (this.evCache[i].pointerId === ev.pointerId) {
+				this.evCache.splice(i,1);
+				break;
+			}
+		}
+		if (this.evCache.length < 2) {
+			this.prevDiff = -1;
+		}
+	},
+	pointermove_handler: function(ev) {
+		console.log('MOVING');
+		for (let i = 0 ; i < this.evCache.length ; i++) {
+			if (this.evCache[i].pointerId === ev.pointterId) {
+				this.evCache[i] = ev;
+				break;
+			}
+		}
+		
+		if (this.evCache.length === 2) {
+			let touchX		= this.evCache[0];
+			let touchY		= this.evCache[1];
+			let curDiff		= Math.hypot(touchY.clientX - touchX.clientX, touchY.clientY - touchX.clientY);
+			if (this.prevDiff > 0) {
+				let delta = curDiff - this.prevDiff;
+				HUD.zoom(CONTEXT.CONTROL, curDiff - this.prevDiff);
+//				if (curDiff > this.prevDiff) {
+//					// Zoom in
+//				}
+//				if (curDiff < this.prevDiff) {
+//					// Zoom out
+//				}
+			}
+			
+			this.prevDiff = curDiff;
+		}
+	}
+}
+
+TouchEvent.init();
