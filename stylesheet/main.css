@@ -185,6 +185,8 @@ body {
 	margin-top: 10px;
 	border-bottom: 3px solid #2f4186;
 	margin-left: 100px;
+	max-height: 30px;
+	overflow-y: hidden;
 }
 
 #help em{
