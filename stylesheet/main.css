@@ -200,8 +200,10 @@ body {
 ************************************/
 #treeView{
 	position: fixed;
-	left: 20px;
-	bottom: 75px;
+	left: 10px;
+	bottom: 40px;
+	direction: rtl;
+	text-align: left;
 }
 
 #treeView ul{
@@ -216,50 +218,46 @@ body {
 }
 
 #tree{
-	max-height: 500px;
-	overflow-y: auto;
+	max-height: 400px;
+	overflow-y: scroll;
+	transition: max-height 2s ease-in-out;
 }
 
 #tree li{
 	margin-left: 3px;
-	margin-right: 10px;
+	margin-right: 30px;
 	border-left: 1px solid rgba(202,202,202,0.8);
 	list-style-type: none;
-	font-weight: 5s00;
+	font-weight: 500;
     font-size: 13px;
 	padding-left: 10px;
 }
 
-.unrolled{
-	cursor: pointer !important;
+#treeOrigin > span{
+	margin-left: 10px;
+}
+
+.parentNode{
 	font-size: 15px !important;
 	color: rgba(204,136,136,0.8) !important;
-	transition: color 0.2s ease-in-out;
+	transition: color 0.5s ease-in-out;
 }
 
-.rolled{
-	cursor: pointer !important;
-	font-size: 15px !important;
-	color: rgba(136,204,204,0.8) !important;
-	transition: color 0.2s ease-in-out;
+.parentNode > span, #expandTree{
+	cursor: pointer;
 }
 
-.rolled ul{
-	max-height: 0px;
-	overflow-y: hidden;
-	transition: max-height 0.5s ease-in-out;
+.parentNode ul{
+	overflow: hidden;
 }
 
-.unrolled:hover{
-	color: rgba(204,204,136,0.8) !important;
+.fa-caret-right{
+	padding-left: 4px;
 }
 
-.rolled:hover{
-	color: rgba(204,136,136,0.8) !important;
-}
 
-.rolled:hover > ul{
-	max-height: 100px;
+.rolled > span{
+	color: rgba(136,136,204,0.8) !important;
 }
 
 .lockedFocus{
@@ -274,16 +272,12 @@ body {
 	left: 5px;
 	color: rgb(102,102,102);
 	cursor: pointer;
-	opacity: 0;
-	transition: color 1s ease-in-out;
+	opacity: 0.25;
+	transition: all 0.5s ease-in-out;
 }
 
 .unlockedFocus:hover{
 	color: rgba(224,224,96,0.8);
-}
-
-#treeView li:hover > .unlockedFocus{
-	opacity: 0.4;
 }
 
 ::-webkit-scrollbar{
