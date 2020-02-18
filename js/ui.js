@@ -106,7 +106,7 @@ function toggleRoll(el) {
 }
 
 function setFocusOn(el) {
-	FOCUS.setFocusByName(el.previousElementSibling.innerHTML);
+	FOCUS.setFocusByName(el.parentElement.getElementsByTagName('span')[0].innerHTML);
 }
 
 function loadScenario(el) {
