@@ -101,8 +101,22 @@ function hideHelp() {
 }
 
 function toggleRoll(el) {
-	el.classList.toggle('rolled');
-	el.classList.toggle('unrolled');
+	el.parentElement.classList.toggle('rolled');
+	if (el.parentElement.classList.contains('rolled')) {
+		collapseSection(el.nextElementSibling, timeCollapse);
+	} else {
+		expandSection(el.nextElementSibling, timeCollapse);
+	}
+}
+
+function toggleTree(el) {
+	if (el.classList.contains('fa-caret-down')) {
+		collapseSection(el.nextElementSibling, timeCollapseTree);
+	} else {
+		expandSection(el.nextElementSibling, timeCollapseTree);
+	}
+	el.classList.toggle('fa-caret-down');
+	el.classList.toggle('fa-caret-right');
 }
 
 function setFocusOn(el) {
