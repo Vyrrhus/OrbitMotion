@@ -189,17 +189,15 @@ document.addEventListener('click', function(event) {
 var CACHE_EVENT = new Array();
 var PREV_DIFF	= -1;
 
-document.onpointerdown		= pointerdown_handler;
-document.onpointermove		= pointermove_handler;
-document.onpointerup		= pointerup_handler;
-document.onpointercancel	= pointerup_handler;
-document.onpointerout		= pointerup_handler;
-document.onpointerleave		= pointerup_handler;
+document.ontouchstart	= touchstart_handler;
+document.ontouchmove	= touchmove_handler;
+document.ontouchend		= touchend_handler;
+document.ontouchcancel	= touchend_handler;
 
-function pointerdown_handler(ev) {
+function touchstart_handler(ev) {
 	CACHE_EVENT.push(ev);
 }
-function pointerup_handler(ev) {
+function touchend_handler(ev) {
 	for (let i = 0 ; i < CACHE_EVENT.length ; i++) {
 		if (CACHE_EVENT[i].pointerId === ev.pointerId) {
 			CACHE_EVENT.splice(i,1);
@@ -207,7 +205,7 @@ function pointerup_handler(ev) {
 		}
 	}
 }
-function pointermove_handler(ev) {
+function touchmove_handler(ev) {
 	console.log('MOVING');
 	for (let i = 0 ; i < CACHE_EVENT.length ; i++) {
 		if (CACHE_EVENT[i].pointerId === ev.pointerId) {
