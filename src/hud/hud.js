@@ -1,20 +1,26 @@
 const HUD = {
 	/*
-		objet pour gérer tous les sous-objets du HUD, les différents events, etc.
-        HUD:
-        
-        *-----------------------*   1:  PLANE + SCALE (== COMPASS)
-        |SCEN | SETS | HELP     |   2:  TIME
-        |                       |   3:  TREE + FOCUS
-        |                       |
-        |                       |
-        |-----*                 |
-        |     |          *------|
-        |     |          |  2   |
-        |  3  |          *------|
-        |     |          |      |
-        |     |          |  1   |
         *-----------------------*
+        |SCEN | SETS | HELP     |
+        |                       |
+        |                       |
+        |                       |
+        |                       |
+        |                       |
+        |                       |
+        |                       |
+		|                       |
+		|                   ^   |
+		|                   |   |
+		|*--4--*          3 |-->| 
+		|                       |
+		|*---1---*     *---2---*| bottomLine (15px)
+		|                       |
+        *-----------------------*
+		1: TIME (YYYY-MM-DD hh:mm:ss)
+		2: SCALE
+		3: PLANE
+		4: TREE VIEW
 	*/
 	zoom: true,
 	move: true,
@@ -63,7 +69,3 @@ const HUD = {
 		this.focus = true;
 	}
 }
-
-/*
-	HUD contiendra également les éléments graphiques d'un menu, c'est un gros module avec beaucoup d'évènements
-*/
