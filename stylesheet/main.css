@@ -204,6 +204,8 @@ body {
 	bottom: 40px;
 	direction: rtl;
 	text-align: left;
+	border-radius: 10px;
+	background-color: rgba(50,50,50,0.3);
 }
 
 #treeView ul{
