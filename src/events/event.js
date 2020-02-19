@@ -266,8 +266,8 @@ function touchmove_handler(ev) {
 		let touch	= ev.changedTouches[0];
 		let swipe	= CACHE_TOUCHES.swipeDirection(touch);
 		if (swipe !== null) {
-			PLANE.x = quat.rotate(PLANE.x, 0.1 * swipe.radius * Math.cos(swipe.angle + Math.PI / 2), PLANE.y);
-			PLANE.y = quat.rotate(PLANE.y, 0.1 * swipe.radius * Math.sin(swipe.angle + Math.PI / 2), PLANE.x);
+			PLANE.x = quat.rotate(PLANE.x, 0.1 * swipe.radius * Math.cos(swipe.angle), PLANE.y);
+			PLANE.y = quat.rotate(PLANE.y, 0.1 * swipe.radius * Math.sin(swipe.angle), PLANE.x);
 			PLANE.z = vect3.cross(PLANE.x, PLANE.y);
 			if (PAUSE) {
 				draw_body();
