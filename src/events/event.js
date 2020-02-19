@@ -188,6 +188,7 @@ document.addEventListener('click', function(event) {
 var CACHE_TOUCHES = {
 	list: new Array(),
 	prevTouches: new Array(),
+	prevDiff: -1,
 	minDist: 10,
 	length: 0,
 	center: {x: 0, y: 0},
@@ -197,6 +198,7 @@ var CACHE_TOUCHES = {
 		this.length += 1;
 		if (this.length === 2) {
 			this.center = this.getCenter(this.list[0], this.list[1]);
+			this.prevDiff = -1;
 		}
 	},
 	remove: function(touch) {
@@ -241,7 +243,6 @@ Touch.prototype.angle	= function (centerX, centerY) {
 	}
 }
 
-var PREV_DIFF	= -1;
 document.ontouchstart	= touchstart_handler;
 document.ontouchend		= touchend_handler;
 document.ontouchcancel	= touchend_handler;
@@ -260,31 +261,18 @@ function touchend_handler(ev) {
 	}
 }
 function touchmove_handler(ev) {
-	/*
-		Besoin de gérer la position des Touch avec un .identifier commun à l'instant précédent.
-		On pourrait imaginer définir une distance minimale entre les deux Touch pour considérer le move valide ? Pas énorme tho, quelques pixels
-		Si coefficient directeur globalement constant mais que la distance augmente / diminue ==> zoom
-		Si coefficient directeur évolue ==> rotation
-		Si distance trop faible ==> osef, on update pas le CACHE_TOUCH, un dict dont les entrées seront les identifier des Touch ? 
-		Un objet où l'on puisse ajouter des "familles" de Touch qui partagent un id commun, les comparer en terme de distance ou avec une autre famille pour obtenir le coefficient directeur
-		Nécessité peut-être de jongler entre screenX et clientX
-		Besoin de faire un site web qui permettent de tester toutes les configs possibles (github.io) : rotate, zoom in, zoom out, vitesse dudit zoom, distance minimale entre les deux, ellipse, etc.
-		
-		Besoin ensuite de créer de quoi bloquer les rotations / zoom sur mobile et de switch de mode pour afficher les trajectoires
-		Besoin également d'ajouter des boutons pour accélérer / réduire le temps
-		Réfléchir aux propriétés du zoom via le delta pour éventuellement l'améliorer
-		HELP ME spécial mobile ? Pour la partie contrôles?
-	*/
 	if (CACHE_TOUCHES.length === 1) {
-		// Rotation around a given vector
+		// Rotation using quaternions along a given vector
 		let touch	= ev.changedTouches[0];
 		let swipe	= CACHE_TOUCHES.swipeDirection(touch);
 		if (swipe !== null) {
-			let direction		= vect3.exp(swipe.angle, 1);
-			let vectRotation	= vect3.cross(PLANE.z, direction);
-			PLANE.x = quat.rotate(PLANE.x, 0.1 * swipe.radius, vectRotation);
-			PLANE.y = quat.rotate(PLANE.y, 0.1 * swipe.radius, vectRotation);
+			PLANE.x = quat.rotate(PLANE.x, 0.1 * swipe.radius * Math.cos(swipe.angle + Math.PI / 2), PLANE.y);
+			PLANE.y = quat.rotate(PLANE.y, 0.1 * swipe.radius * Math.sin(swipe.angle + Math.PI / 2), PLANE.x);
 			PLANE.z = vect3.cross(PLANE.x, PLANE.y);
+			if (PAUSE) {
+				draw_body();
+			}
+			HUD.drawPlane(CONTEXT.CONTROL);
 		}
 	}
 	if (CACHE_TOUCHES.length === 2) {
@@ -293,9 +281,9 @@ function touchmove_handler(ev) {
 		let touchA		= touchList[0];
 		let touchB		= touchList[1];
 		let curDiff		= Math.hypot(touchB.clientX - touchA.clientX, touchB.clientY - touchA.clientY);
-		if (PREV_DIFF > 0) {
-			HUD.zoom(CONTEXT.CONTROL, PREV_DIFF - curDiff);
+		if (CACHE_TOUCHES.prevDiff > 0) {
+			HUD.zoom(CONTEXT.CONTROL, CACHE_TOUCHES.prevDiff - curDiff);
 		}
-		PREV_DIFF = curDiff;
+		CACHE_TOUCHES.prevDiff = curDiff;
 	}
 }
