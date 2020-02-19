@@ -159,4 +159,9 @@ class vect3 {
 	static square_distance(u,v) {
 		return Math.square(u.x - v.x) + Math.square(u.y - v.y) + Math.square(u.z - v.z)
 	}
+	static exp(angle, radius) {
+		let x = radius * Math.cos(angle);
+		let y = radius * Math.sin(angle);
+		return new vect3(x,y,0)
+	}
 }
