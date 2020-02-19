@@ -20,7 +20,7 @@ class Sketch {
 		this.show		= {
 			body:		true,
 			label:		true,
-			SOI:		true,
+			SOI:		false,
             anomaly:    false
 		};
 		this.toggle		= {
@@ -171,6 +171,10 @@ class Sketch {
 		}
 		if (y < this.current.position.y - this.size.radius || y > this.current.position.y + this.size.radius) {
 			return
+		}
+		this.show.SOI = !this.show.SOI;
+		if (PAUSE) {
+			draw_body();
 		}
 		console.log(`CLICKED ON ${this.body.name}`)
 	}
