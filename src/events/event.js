@@ -185,39 +185,17 @@ document.addEventListener('click', function(event) {
 })
 
 // TOUCH EVENTS (mobile purpose)
-
-var CACHE_EVENT = new Array();
 var PREV_DIFF	= -1;
-
-document.ontouchstart	= touchstart_handler;
 document.ontouchmove	= touchmove_handler;
-document.ontouchend		= touchend_handler;
-document.ontouchcancel	= touchend_handler;
 
-function touchstart_handler(ev) {
-	CACHE_EVENT.push(ev);
-}
-function touchend_handler(ev) {
-	for (let i = 0 ; i < CACHE_EVENT.length ; i++) {
-		if (CACHE_EVENT[i].identifier === ev.identifier) {
-			CACHE_EVENT.splice(i,1);
-			break;
-		}
-	}
-}
 function touchmove_handler(ev) {
-	for (let i = 0 ; i < CACHE_EVENT.length ; i++) {
-		if (CACHE_EVENT[i].identifier === ev.identifier) {
-			CACHE_EVENT[i] = ev;
-			break;
-		}
-	}
-	if (CACHE_EVENT.length === 2) {
-		let touchA	= CACHE_EVENT[0];
-		let touchB	= CACHE_EVENT[1];
-		let curDiff = Math.hypot(touchB.clientX - touchA.clientX, touchB.clientY - touchA.clientY);
+	if (ev.changedTouches.length === 2) {
+		let touchList	= ev.changedTouches;
+		let touchA		= touchList[0];
+		let touchB		= touchList[1];
+		let curDiff		= Math.hypot(touchB.clientX - touchA.clientX, touchB.clientY - touchA.clientY);
 		if (PREV_DIFF > 0) {
-			HUD.zoom(CONTEXT.CONTROL, curDiff - PREV_DIFF)
+			HUD.zoom(CONTEXT.CONTROL, curDiff - PREV_DIFF);
 		}
 		PREV_DIFF = curDiff;
 	}
