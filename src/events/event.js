@@ -195,7 +195,7 @@ function touchmove_handler(ev) {
 		let touchB		= touchList[1];
 		let curDiff		= Math.hypot(touchB.clientX - touchA.clientX, touchB.clientY - touchA.clientY);
 		if (PREV_DIFF > 0) {
-			HUD.zoom(CONTEXT.CONTROL, curDiff - PREV_DIFF);
+			HUD.zoom(CONTEXT.CONTROL, PREV_DIFF - currDiff);
 		}
 		PREV_DIFF = curDiff;
 	}
