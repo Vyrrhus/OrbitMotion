@@ -199,16 +199,15 @@ function touchstart_handler(ev) {
 }
 function touchend_handler(ev) {
 	for (let i = 0 ; i < CACHE_EVENT.length ; i++) {
-		if (CACHE_EVENT[i].pointerId === ev.pointerId) {
+		if (CACHE_EVENT[i].identifier === ev.identifier) {
 			CACHE_EVENT.splice(i,1);
 			break;
 		}
 	}
 }
 function touchmove_handler(ev) {
-	console.log('MOVING');
 	for (let i = 0 ; i < CACHE_EVENT.length ; i++) {
-		if (CACHE_EVENT[i].pointerId === ev.pointerId) {
+		if (CACHE_EVENT[i].identifier === ev.identifier) {
 			CACHE_EVENT[i] = ev;
 			break;
 		}
