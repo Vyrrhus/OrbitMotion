@@ -237,7 +237,7 @@ Touch.prototype.angle	= function (centerX, centerY) {
 	if (hypot === 0) {
 		return 0
 	} else {
-		return quadrant((this.clientX - centerX) / hypot, (centerY - this.clientY) / hypot)
+		return tool.quadrant((this.clientX - centerX) / hypot, (centerY - this.clientY) / hypot)
 	}
 }
 
