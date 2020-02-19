@@ -13,6 +13,7 @@ body {
     margin: 0;
     font-family: 'Oswald', Helvetica, arial, sans-serif;
     overflow: hidden;
+	overscroll-behavior-y: contain;
 }
 
 /************************************
