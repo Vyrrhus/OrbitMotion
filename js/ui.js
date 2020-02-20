@@ -136,3 +136,10 @@ function loadScenario(el) {
     _SCENARIO = el.id;
     Script.load(_SCENARIO, start);
 }
+
+function togglePlayPause(el) {
+	let iconList = el.getElementsByTagName('i');
+	for (let i = 0 ; i < iconList.length ; i++) {
+		iconList[i].classList.toggle('hidden');
+	}
+}

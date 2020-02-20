@@ -74,5 +74,14 @@ var TIME = {
 	},
 	toggle_devMode: function() {
 		this.devMode = !this.devMode;
+	},
+	timeForward: function() {
+		this.dT *= 1.15;
+	},
+	timeBackward: function() {
+		this.dT *= 0.85;
+	},
+	togglePause: function() {
+		PAUSE = !PAUSE;
 	}
 };

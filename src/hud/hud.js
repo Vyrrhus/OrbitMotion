@@ -27,6 +27,7 @@ const HUD = {
 	focus: true,
     dimensions: {
 		bottomLine: 15,
+		bottomTimeLine: 35,
 		widthMargin: 10
     },
     drawScale: function(ctx) {
@@ -41,7 +42,7 @@ const HUD = {
     },
     drawTime: function(ctx) {
 		let x0 = this.dimensions.widthMargin;
-		let y0 = HEIGHT - this.dimensions.bottomLine;
+		let y0 = HEIGHT - this.dimensions.bottomTimeLine;
 		TIME.draw_hud(ctx, x0, y0)
     },
 	lock: function() {

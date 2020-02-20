@@ -43,6 +43,14 @@ body {
     left: 5px;
 }
 
+.timeContainer{
+	position: absolute;
+	width: 100%;
+	z-index: 100;
+	bottom: 5px;
+	left: 30px;
+}
+
 .butt {
     border: none;
     color: rgba(202,202,202,0.8);
@@ -70,6 +78,29 @@ body {
 .butt:hover{
     background-color: rgba(202,202,202,0.8);
     color: rgba(0,10,15,0.8);
+}
+
+.butt-time{
+	border: none;
+	padding: 5px 8px;
+	margin: 1px;
+	color: rgba(202,202,202,0.8);
+	text-align: bottom;
+	text-decoration: none;
+	display: inline-block;
+	font-size: 16px;
+	cursor: pointer;
+	-webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -o-user-select: none;
+    user-select: none;
+	transition: color 0.1s ease-in-out;
+}
+
+.butt-time:hover{
+	color: rgba(50,50,50,0.8);
 }
 
 .centered{
@@ -203,7 +234,7 @@ body {
 #treeView{
 	position: fixed;
 	left: 10px;
-	bottom: 40px;
+	bottom: 55px;
 	direction: rtl;
 	text-align: left;
 	border-radius: 10px;
@@ -282,6 +313,14 @@ body {
 
 .unlockedFocus:hover{
 	color: rgba(224,224,96,0.8);
+}
+
+/************************************
+*             TIME BUTT             *
+************************************/
+
+#play-pause .hidden{
+	display: none;
 }
 
 ::-webkit-scrollbar{

@@ -71,6 +71,19 @@
 	</div>
     </div>
 	
+	<div class="timeContainer">
+		<div class="butt-time">
+			<i class="fas fa-backward" onclick="TIME.timeBackward()"></i>
+		</div>
+		<div id="play-pause" class="butt-time" onclick="togglePlayPause(this); TIME.togglePause();">
+			<i class="fas fa-play"></i>
+			<i class="fas fa-pause hidden"></i>
+		</div>
+		<div class="butt-time">
+			<i class="fas fa-forward" onclick="TIME.timeForward()"></i>
+		</div>
+	</div>
+	
 <!--JAVASCRIPT SOURCES-->
 	
 	<!--	ENGINE	-->
