@@ -99,7 +99,7 @@ body {
 	transition: color 0.1s ease-in-out;
 }
 
-.butt-time:hover{
+.butt-time:active{
 	color: rgba(50,50,50,0.8);
 }
 
