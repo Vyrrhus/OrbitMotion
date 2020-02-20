@@ -114,6 +114,7 @@ class Script {
 			this.list_bodies.push(body);
 			return
 		}
+		
 		console.log(`Something wrong happened for ${body.name} while getting added to the script ${this.name}`);
 	}
 	sort_script() {
@@ -179,6 +180,9 @@ class Script {
 			for (let i = 0 ; i < lastParent.length ; i++) {
 				let parent = lastParent[i];
 				let childSorted = parent.child.sort(function(a,b) {
+					if (Math.round(a.orbit.a) === Math.round(b.orbit.a)) {
+						return (a.name - b.name)
+					}
 					return (a.orbit.a - b.orbit.a)
 				});
 				
