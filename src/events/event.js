@@ -51,7 +51,7 @@ window.onload = function() {
 }
 
 // WHEEL EVENT
-document.addEventListener('wheel', function(event) {
+CANVAS.CONTROL.addEventListener('wheel', function(event) {
 	HUD.zoom(CONTEXT.CONTROL, event.deltaY);
 });
 
@@ -177,12 +177,12 @@ document.addEventListener('keypress', function(event) {
 });
 
 // CLICK EVENT
-document.addEventListener('click', function(event) {
+CANVAS.CONTROL.addEventListener('click', function(event) {
 	for (var i = 0 ; i < LIST_OBJ.length ; i++) {
 		LIST_OBJ[i].sketch.onclick(event.clientX, event.clientY);
 	}
 	console.log(`x:${event.clientX} ; y:${event.clientY}`);
-})
+});
 
 // TOUCH EVENTS (mobile purpose)
 var CACHE_TOUCHES = {
@@ -243,10 +243,10 @@ Touch.prototype.angle	= function (centerX, centerY) {
 	}
 }
 
-document.ontouchstart	= touchstart_handler;
-document.ontouchend		= touchend_handler;
-document.ontouchcancel	= touchend_handler;
-document.ontouchmove	= touchmove_handler;
+CANVAS.CONTROL.ontouchstart		= touchstart_handler;
+CANVAS.CONTROL.ontouchend		= touchend_handler;
+CANVAS.CONTROL.ontouchcancel	= touchend_handler;
+CANVAS.CONTROL.ontouchmove		= touchmove_handler;
 
 function touchstart_handler(ev) {
 	let touchList = ev.changedTouches;
