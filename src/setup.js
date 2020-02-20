@@ -23,6 +23,10 @@ var CENTER = {x: Math.floor(WIDTH/2), y: Math.floor(HEIGHT/2)};
 var UA 	= 149597870.7; 							// km
 var G 	= 6.67408e-20; 							// km3/kg/s2
 
+// DEVICE PIXEL RATIO
+var WINDOW_LOADED = false;
+var DPR = window.devicePixelRatio;
+
 // Inertial coordinate vectors
 const I = new vect3(1,0,0);
 const J = new vect3(0,1,0);

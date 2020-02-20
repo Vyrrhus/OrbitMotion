@@ -10,9 +10,15 @@ function resize() {
 //	set_blackscreen();
 
 	function resizeCanvas(canvas) {
+		if (WINDOW_LOADED) {
+			DPR = window.devicePixelRatio;
+		}
 		for (element in canvas) {
-			CANVAS[element].width = WIDTH;
-			CANVAS[element].height = HEIGHT;
+			CANVAS[element].width = WIDTH * DPR;
+			CANVAS[element].height = HEIGHT * DPR;
+		}
+		for (element in CONTEXT) {
+			CONTEXT[element].scale(DPR,DPR);
 		}
 	}
 	function set_background() {
@@ -48,6 +54,7 @@ window.onload = function() {
 	resize();
 	window.addEventListener('resize', function() {draw_body();resize();}, false);
 	Script.load(_SCENARIO, start);
+	WINDOW_LOADED = true;
 }
 
 // WHEEL EVENT
