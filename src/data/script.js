@@ -77,6 +77,9 @@ class Script {
 		*/
         // Reset the body
         body.init();
+		if (options.minRadius !== undefined) {
+			body.sketch.size.min_radius = options.minRadius;
+		}
         
 		// State definition
 		if (options.position === undefined) {
