@@ -127,6 +127,6 @@ function draw_body() {
 	}
 	for (var i = 0 ; i < LIST_TO_SORT.length ; i++) {
 		LIST_TO_SORT[i].sketch.draw_body(CONTEXT.SKETCH, SCALE.value);
-		LIST_TO_SORT[i].sketch.draw_trajectory(CONTEXT.SKETCH, SCALE.value, PLANE, CENTER, {ctx: CONTEXT.SKETCH2});
+//		LIST_TO_SORT[i].sketch.draw_trajectory(CONTEXT.SKETCH, SCALE.value, PLANE, CENTER, {ctx: CONTEXT.SKETCH2});
 	}
 }
