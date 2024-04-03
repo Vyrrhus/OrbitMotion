@@ -15,7 +15,7 @@ class Sketch {
 		};
 		
 		// HUD
-		this.mode		= 'comet';
+		this.mode		= 'default';
 		this.modes 		= ['comet', 'default'];
 		this.show		= {
 			body:		true,
